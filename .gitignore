@@ -1,0 +1,64 @@
+# macOS files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Node.js dependencies
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.*.local
+
+# Build directories
+dist/
+build/
+.cache/
+.tmp/
+
+# Static site generators (e.g., Gatsby)
+public/
+
+# Python cache and virtual environments
+__pycache__/
+*.py[cod]
+venv/
+ENV/
+env/
+.venv/
+
+# PHP dependencies
+vendor/
+composer.lock
+
+# IDE/editor settings
+.vscode/
+*.code-workspace
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS-generated files
+Thumbs.db
+
+# Coverage reports
+coverage/
+*.lcov
+
+# SQLite databases
+*.sqlite3
+
+# Optional: user uploads or media
+uploads/
+media/
+
