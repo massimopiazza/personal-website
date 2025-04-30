@@ -1,0 +1,245 @@
+/* Main stylesheet for Massimo Piazza personal site */
+
+/* Import custom fonts for the website */
+@font-face {
+  font-family: 'TitleDefense';
+  src: url('https://fonts.gstatic.com/s/spacegrotesk/v21/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj7oUXskPMZBSSJLm2E.woff') format('woff');
+}
+@font-face {
+  font-family: 'BodyDefense';
+  src: url('https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2') format('woff2');
+}
+
+/* Root-level CSS variables */
+:root {
+  --accent: rgb(152,0,0);
+  --nav-height: 60px;
+  --footer-height: 60px;
+  --extra-offset: 10px;
+  --accordion-width: 100%; /* full width on mobile */
+  --accordion-offset: 1.5rem; /* gap beyond line end */
+  --button-size: 1.4rem;
+  --accordion-gap: 4px; /* subtract this to inset + button */
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  :root { --accordion-width: 70%; }
+}
+
+/* Global resets */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Body layout */
+body {
+  font-family: 'BodyDefense', sans-serif;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+}
+
+/* Navigation bar */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--nav-height);
+  background: #000;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  z-index: 100;
+}
+nav a {
+  font-family: 'TitleDefense', sans-serif;
+  color: #fff;
+  text-decoration: none;
+  margin-right: 2rem;
+  position: relative;
+  padding: 0.5rem 0;
+}
+nav a:last-child { margin-right: 0; }
+nav a:hover { opacity: 0.8; }
+nav .indicator {
+  position: absolute;
+  bottom: 0;
+  height: 4px;
+  width: 0;
+  background: var(--accent);
+  transition: left 0.3s, width 0.3s;
+}
+
+/* Main content area */
+main {
+  padding-top: var(--nav-height);
+  padding-bottom: var(--footer-height);
+  flex: 1;
+}
+section {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  scroll-margin-top: calc(var(--nav-height) + var(--extra-offset));
+}
+
+/* Section headings */
+h2 {
+  font-family: 'TitleDefense', sans-serif;
+  margin-bottom: 1rem;
+  color: var(--accent);
+  font-size: 2.2rem;
+}
+
+/* About section */
+#about img {
+  width: 150px;
+  border-radius: 50%;
+  margin: 1rem 0;
+}
+.bio-para { margin-bottom: 1rem; }
+.bio-extra {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+}
+.bio-extra.open { max-height: 1000px; }
+.toggle-bio {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.toggle-bio svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke: var(--accent);
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.3s ease;
+  transform-origin: center center;
+}
+.toggle-bio.open svg { transform: rotate(180deg); }
+.toggle-text {
+  margin-left: 0.5rem;
+  font-family: 'BodyDefense', sans-serif;
+  color: #333;
+  text-transform: lowercase;
+  transition: opacity 0.3s ease;
+}
+.toggle-bio.open .toggle-text { opacity: 0; }
+
+/* Accordion for projects */
+.accordion-header {
+  position: relative;
+  cursor: pointer;
+  padding: 1rem 0;
+  display: grid;
+  grid-template-columns: calc(var(--accordion-width) - var(--accordion-offset)) auto;
+  align-items: center;
+  font-family: 'TitleDefense', sans-serif;
+}
+.accordion-header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--accordion-width);
+  border-bottom: 1px solid #ddd;
+}
+/* Moving separator line */
+.accordion-header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--accordion-width);
+  border-bottom: 1px solid #ddd;
+  transform: translateY(var(--line-move, 0));
+  transition: transform 0.5s ease;
+}
+
+.accordion-header span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-size);
+  height: var(--button-size);
+  font-size: var(--button-size);
+  transition: transform 0.5s ease;
+  transform-origin: center center;
+  color: var(--accent);
+}
+.accordion-header.open span { transform: rotate(45deg); }
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+}
+/* Move the gap inside the list so content itself stays static */
+.accordion-content ul {
+  margin-top: 1.2rem;
+  list-style: disc inside;
+  padding: 0 1rem;
+  margin-bottom: 0;
+}
+.accordion-content ul li {
+  margin-bottom: 0.75rem;
+}
+.accordion-content a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.accordion-content a:hover { text-decoration: underline; }
+
+/* Consulting section */
+#consulting { margin-top: 4rem; }
+#consulting p { font-style: italic; }
+
+/* Contact form */
+#contact { margin-top: 4rem; }
+form { display: flex; flex-direction: column; }
+label { margin-bottom: 0.5rem; font-weight: bold; }
+input, textarea {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  font-family: 'BodyDefense', sans-serif;
+}
+button {
+  padding: 0.75rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-family: 'TitleDefense', sans-serif;
+}
+
+/* Footer and social icons */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--footer-height);
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.socials { display: flex; }
+.socials a { margin: 0 0.5rem; }
+.socials img {
+  width: 32px;
+  height: 32px;
+  filter: invert(100%);
+}

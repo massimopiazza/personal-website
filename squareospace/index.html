@@ -4,133 +4,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Massimo Piazza</title>
-  
-  <!-- Inline CSS for styling the website -->
-  <style>
-    /* Import custom fonts for the website */
-    @font-face { font-family: 'TitleDefense'; src: url('https://fonts.gstatic.com/s/spacegrotesk/v21/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj7oUXskPMZBSSJLm2E.woff') format('woff'); }
-    @font-face { font-family: 'BodyDefense'; src: url('https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2') format('woff2'); }
-    /* Mobile-first defaults */
-    :root {
-      --accent: rgb(152,0,0);
-      --nav-height: 60px;
-      --footer-height: 60px;
-      --extra-offset: 10px;
-      --accordion-width: 100%; /* full width on mobile */
-      --accordion-offset: 1.5rem; /* gap beyond line end */
-      --button-size: 1.4rem;
-      --accordion-gap: 4px; /* subtract this to inset + button */
-    }
-    @media (min-width: 768px) {
-      :root { --accordion-width: 70%; }
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'BodyDefense', sans-serif; color: #333; display: flex; flex-direction: column; min-height: 100vh; scroll-behavior: smooth; }
-    nav { position: fixed; top: 0; left: 0; width: 100%; height: var(--nav-height); background: #000; display: flex; align-items: center; padding: 0 2rem; z-index: 100; }
-    nav a { font-family: 'TitleDefense', sans-serif; color: #fff; text-decoration: none; margin-right: 2rem; position: relative; padding: 0.5rem 0; }
-    nav a:last-child { margin-right: 0; }
-    nav a:hover { opacity: 0.8; }
-    nav .indicator { position: absolute; bottom: 0; height: 4px; width: 0; background: var(--accent); transition: left 0.3s, width 0.3s; }
-    main { padding-top: var(--nav-height); padding-bottom: var(--footer-height); flex: 1; }
-    section { max-width: 800px; margin: 2rem auto; padding: 0 1rem; scroll-margin-top: calc(var(--nav-height) + var(--extra-offset)); }
-    h2 { font-family: 'TitleDefense', sans-serif; margin-bottom: 1rem; color: var(--accent); font-size: 2.2rem; }
-    /* About */
-    #about img { width:150px; border-radius:50%; margin:1rem 0; }
-    .bio-para { margin-bottom:1rem; }
-    .bio-extra { max-height:0; overflow:hidden; transition:max-height 0.5s ease; }
-    .bio-extra.open { max-height:1000px; }
-    .toggle-bio { display: inline-flex; align-items: center; background: none; border: none; cursor: pointer; }
-    .toggle-bio svg { width: 1.5rem; height: 1.5rem; stroke: var(--accent); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; transform-origin: center center; }
-    .toggle-bio.open svg { transform: rotate(180deg); }
-    .toggle-text { margin-left: 0.5rem; font-family: 'BodyDefense', sans-serif; color: #333; text-transform: lowercase; transition: opacity 0.3s ease; }
-    .toggle-bio.open .toggle-text { opacity: 0; }
-    /* Projects */
-    .accordion-header {
-      position: relative;
-      cursor: pointer;
-      padding: 1rem 0;
-      display: grid;
-      /* line spans full dynamic width, minus offset for plus positioning */
-      grid-template-columns: calc(var(--accordion-width) - var(--accordion-offset)) auto;
-      align-items: center;
-      font-family: 'TitleDefense', sans-serif;
-    }
-    .accordion-header::before {
-      content: '';
-      position: absolute;
-      left: 0px;             /* added unit */
-      bottom: 0;
-      /* separator covers full dynamic width */
-      width: var(--accordion-width);
-      border-bottom: 1px solid #ddd;
-    }
-    .accordion-header span {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: var(--button-size);
-      height: var(--button-size);
-      font-size: var(--button-size);
-      transition: transform 0.5s ease;
-      transform-origin: center center;
-      color: var(--accent);
-      /* positioned by grid, no extra margins */
-    }
-    .accordion-header.open span { transform: rotate(45deg); }
-    .accordion-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s ease;
-      padding-top: 0;
-    }
-    .accordion-content.open { max-height: 500px; padding-top: 1.5rem; }
-    .accordion-content ul { list-style: disc inside; padding: 0 1rem; margin: 0; }
-    .accordion-content ul li { margin-bottom: 0.75rem; }
-    .accordion-content a { color: var(--accent); text-decoration: none; }
-    .accordion-content a:hover { text-decoration: underline; }
-    /* Consulting */
-    #consulting { margin-top: 4rem; }
-    #consulting p { font-style: italic; }
-    /* Contact */
-    #contact { margin-top: 4rem; }
-    form { display: flex; flex-direction: column; }
-    label { margin-bottom: 0.5rem; font-weight: bold; }
-    input, textarea { margin-bottom: 1rem; padding: 0.5rem; font-family: 'BodyDefense', sans-serif; }
-    button { padding: 0.75rem; background: var(--accent); color: #fff; border: none; cursor: pointer; font-family: 'TitleDefense', sans-serif; }
-    /* Footer */
-    footer { position: fixed; bottom: 0; left: 0; width: 100%; height: var(--footer-height); background: #000; display: flex; justify-content: center; align-items: center; }
-    .socials { display: flex; }
-    .socials a { margin: 0 0.5rem; }
-    .socials img { width: 32px; height: 32px; filter: invert(100%); }
-  </style>
+  <!-- Link to external stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!-- Navigation -->
   <nav>
     <a href="#about" class="nav-link active">About</a>
-    <a href="#projects" class="nav-link">Work &amp; Projects</a>
+    <a href="#projects" class="nav-link">Work & Projects</a>
     <a href="#consulting" class="nav-link">Consulting</a>
     <a href="#contact" class="nav-link">Contact</a>
     <div class="indicator" id="indicator"></div>
   </nav>
+
   <main>
+    <!-- About Section -->
     <section id="about">
       <h2>About Me</h2>
-      <img src="squareospace/img/massimo_piazza_profile_pic.jpg" alt="Massimo-Piazza">
-            <p class="bio-para">I am a 27-year-old engineer with 4+ years of working experience in the space industry and a MSc in Space Engineering from Politecnico di Milano.</p>
-      <p class="bio-para">My current role as a System Budgets Engineer is focused on establishing and monitoring technical budgets, by closely collaborating with performance engineers and contractors. I am also in charge of supporting the requirements management and change management processes, within the framework of a 600-satellite constellation program.</p>
+      <!-- Profile image loaded dynamically via JS -->
+      <img data-src="img/massimo_piazza_profile_pic.jpg" alt="profile-pic">
+      <p class="bio-para">I am a 27-year-old engineer with 4+ years of experience in the space industry and a MSc in Space Engineering from Politecnico di Milano.</p>
+      <p class="bio-para">My current role as a System Budgets Engineer is focused on technical budgets, requirements, and change management for a 600-satellite constellation program.</p>
       <div class="bio-extra" id="bioExtra">
-        <p class="bio-para">In my previous role, I was leading the development of advanced vision-based navigation techniques for close-proximity operations in space. This encompasses a broad variety of activities, ranging from the development of onboard software and project management to systems engineering and AIV/AIT support for a camera / star tracker flying on a small satellite mission.</p>
+        <p class="bio-para">Previously, I led development of vision-based navigation techniques for close-proximity operations, covering onboard software, project management, systems engineering, and AIV/AIT support.</p>
         <p class="bio-para">My work on deep learning-based satellite navigation has been presented at international conferences and published in a peer-reviewed journal.</p>
-        <p class="bio-para">My academic background spans across a diverse array of disciplines, including: Systems Engineering, Deep Learning, Orbital Mechanics, ADCS, Space Propulsion, Signal Processing, Telecommunications and Structural Dynamics. Additionally, I have gained an early hands-on experience through my involvement with the Skyward Experimental Rocketry association.</p>
-        <p class="bio-para">While still in high school I embarked on an entrepreneurial journey, which began at the age of 17, as the CTO & Co-founder of WatchApp Inc. During this time I created innovative software keyboard solutions for iOS.</p>
+        <p class="bio-para">My academic background spans Systems Engineering, Deep Learning, Orbital Mechanics, ADCS, Space Propulsion, Signal Processing, Telecommunications, and Structural Dynamics.</p>
+        <p class="bio-para">In high school, I co-founded WatchApp Inc., creating innovative software keyboard solutions for iOS.</p>
       </div>
       <button class="toggle-bio" id="toggleBio">
         <svg viewBox="0 0 24 24"><polyline points="6,10 12,16 18,10"/></svg>
         <span class="toggle-text">see more</span>
       </button>
     </section>
+
+    <!-- Work & Projects Section -->
     <section id="projects">
-      <h2>Work &amp; Projects</h2>
+      <h2>Work & Projects</h2>
       <div class="accordion">
         <div class="accordion-item">
           <div class="accordion-header">SatCom <span>+</span></div>
@@ -174,10 +83,14 @@
         </div>
       </div>
     </section>
+
+    <!-- Consulting Section -->
     <section id="consulting">
       <h2>Consulting</h2>
       <p><em>Work in progress. Content coming soon!</em></p>
     </section>
+
+    <!-- Contact Section -->
     <section id="contact">
       <h2>Contact Me</h2>
       <form action="#" method="POST">
@@ -191,74 +104,17 @@
       </form>
     </section>
   </main>
+
+  <!-- Footer with social links; icons loaded dynamically via JS -->
   <footer>
     <div class="socials">
-      <a href="mailto:massimopiazza97@gmail.com"><img src="squareospace/icons/email.svg" alt="Email"></a>
-      <a href="https://www.linkedin.com/in/mpiazza97/" target="_blank"><img src="squareospace/icons/linkedin.svg" alt="LinkedIn"></a>
-      <a href="http://x.com/squareospace" target="_blank"><img src="squareospace/icons/x.svg" alt="X"></a>
+      <a href="mailto:massimopiazza97@gmail.com"><img data-src="icons/email.svg" alt="E"></a>
+      <a href="https://www.linkedin.com/in/mpiazza97/" target="_blank"><img data-src="icons/linkedin.svg" alt="L"></a>
+      <a href="http://x.com/squareospace" target="_blank"><img data-src="icons/x.svg" alt="X"></a>
     </div>
   </footer>
-  <script>
-    // JavaScript for dynamic navigation and interactive elements
 
-    // Get CSS variables for navigation height and extra offset
-    const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height'));
-    const extraOffset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--extra-offset'));
-    const indicator = document.getElementById('indicator');
-    const links = document.querySelectorAll('nav .nav-link');
-    const sections = Array.from(links).map(link => ({ id: link.getAttribute('href').substring(1), link }));
-
-    function updateIndicator(elem) {
-      const rect = elem.getBoundingClientRect();
-      const navRect = document.querySelector('nav').getBoundingClientRect();
-      indicator.style.left = (rect.left - navRect.left) + 'px';
-      indicator.style.width = rect.width + 'px';
-    }
-
-    document.getElementById('toggleBio').addEventListener('click', () => {
-      const bio = document.getElementById('bioExtra');
-      const open = bio.classList.toggle('open');
-      document.getElementById('toggleBio').classList.toggle('open', open);
-    });
-
-    links.forEach(link => {
-      const href = link.getAttribute('href');
-      if (href.startsWith('#')) link.addEventListener('click', e => {
-        e.preventDefault();
-        const target = document.getElementById(href.substring(1));
-        window.scrollTo({ top: target.offsetTop - navHeight - extraOffset, behavior: 'smooth' });
-      });
-      link.addEventListener('click', () => {
-        links.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-        updateIndicator(link);
-      });
-    });
-
-    let scrollTimeout;
-    window.addEventListener('scroll', () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        const viewportCenter = window.innerHeight / 2;
-        let current = sections[0];
-        sections.forEach(sec => {
-          if (document.getElementById(sec.id).getBoundingClientRect().top <= viewportCenter) current = sec;
-        });
-        links.forEach(l => l.classList.remove('active'));
-        current.link.classList.add('active');
-        updateIndicator(current.link);
-      }, 50);
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const active = document.querySelector('nav .nav-link.active');
-      if (active) updateIndicator(active);
-      document.querySelectorAll('.accordion-header').forEach(header => header.addEventListener('click', () => {
-        const content = header.nextElementSibling;
-        const open = content.classList.toggle('open');
-        header.classList.toggle('open', open);
-      }));
-    });
-  </script>
+  <!-- Load external JavaScript -->
+  <script src="js/main.js"></script>
 </body>
 </html>
