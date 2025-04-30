@@ -4,14 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Massimo Piazza</title>
+  
+  <!-- Inline CSS for styling the website -->
   <style>
+    /* Import custom fonts for the website */
     @font-face { font-family: 'TitleDefense'; src: url('https://fonts.gstatic.com/s/spacegrotesk/v21/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj7oUXskPMZBSSJLm2E.woff') format('woff'); }
     @font-face { font-family: 'BodyDefense'; src: url('https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2') format('woff2'); }
+    /* Mobile-first defaults */
     :root {
       --accent: rgb(152,0,0);
       --nav-height: 60px;
       --footer-height: 60px;
-      --extra-offset: 20px;
+      --extra-offset: 10px;
+      --accordion-width: 100%; /* full width on mobile */
+      --accordion-offset: 1.5rem; /* gap beyond line end */
+      --button-size: 1.4rem;
+      --accordion-gap: 4px; /* subtract this to inset + button */
+    }
+    @media (min-width: 768px) {
+      :root { --accordion-width: 70%; }
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'BodyDefense', sans-serif; color: #333; display: flex; flex-direction: column; min-height: 100vh; scroll-behavior: smooth; }
@@ -29,17 +40,49 @@
     .bio-extra { max-height:0; overflow:hidden; transition:max-height 0.5s ease; }
     .bio-extra.open { max-height:1000px; }
     .toggle-bio { display: inline-flex; align-items: center; background: none; border: none; cursor: pointer; }
-    .toggle-bio svg { width: 1.5rem; height: 1.5rem; stroke: var(--accent); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s; }
+    .toggle-bio svg { width: 1.5rem; height: 1.5rem; stroke: var(--accent); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; transform-origin: center center; }
     .toggle-bio.open svg { transform: rotate(180deg); }
-    .toggle-text { margin-left: 0.5rem; font-family: 'BodyDefense', sans-serif; color: #333; text-transform: lowercase; transition: opacity 0.3s; }
+    .toggle-text { margin-left: 0.5rem; font-family: 'BodyDefense', sans-serif; color: #333; text-transform: lowercase; transition: opacity 0.3s ease; }
     .toggle-bio.open .toggle-text { opacity: 0; }
     /* Projects */
-    .accordion-item { }
-    .accordion-header { position: relative; cursor: pointer; padding: 1rem 0; display: flex; justify-content: space-between; align-items: center; font-family: 'TitleDefense', sans-serif; border-bottom: 1px solid #ddd; }
-    .accordion-header:last-child { border-bottom: none; }
-    .accordion-header span { display: inline-block; transition: transform 0.5s ease; color: var(--accent); }
+    .accordion-header {
+      position: relative;
+      cursor: pointer;
+      padding: 1rem 0;
+      display: grid;
+      /* line spans full dynamic width, minus offset for plus positioning */
+      grid-template-columns: calc(var(--accordion-width) - var(--accordion-offset)) auto;
+      align-items: center;
+      font-family: 'TitleDefense', sans-serif;
+    }
+    .accordion-header::before {
+      content: '';
+      position: absolute;
+      left: 0px;             /* added unit */
+      bottom: 0;
+      /* separator covers full dynamic width */
+      width: var(--accordion-width);
+      border-bottom: 1px solid #ddd;
+    }
+    .accordion-header span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--button-size);
+      height: var(--button-size);
+      font-size: var(--button-size);
+      transition: transform 0.5s ease;
+      transform-origin: center center;
+      color: var(--accent);
+      /* positioned by grid, no extra margins */
+    }
     .accordion-header.open span { transform: rotate(45deg); }
-    .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; padding-top: 0; }
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+      padding-top: 0;
+    }
     .accordion-content.open { max-height: 500px; padding-top: 1.5rem; }
     .accordion-content ul { list-style: disc inside; padding: 0 1rem; margin: 0; }
     .accordion-content ul li { margin-bottom: 0.75rem; }
@@ -64,7 +107,7 @@
 <body>
   <nav>
     <a href="#about" class="nav-link active">About</a>
-    <a href="#projects" class="nav-link">Work & Projects</a>
+    <a href="#projects" class="nav-link">Work &amp; Projects</a>
     <a href="#consulting" class="nav-link">Consulting</a>
     <a href="#contact" class="nav-link">Contact</a>
     <div class="indicator" id="indicator"></div>
@@ -72,8 +115,8 @@
   <main>
     <section id="about">
       <h2>About Me</h2>
-      <img src="/squareospace/img/massimo_piazza_profile_pic.jpg" alt="Massimo-Piazza">
-      <p class="bio-para">I am a 27-year-old engineer with 4+ years of working experience in the space industry and a MSc in Space Engineering from Politecnico di Milano.</p>
+      <img src="squareospace/img/massimo_piazza_profile_pic.jpg" alt="Massimo-Piazza">
+            <p class="bio-para">I am a 27-year-old engineer with 4+ years of working experience in the space industry and a MSc in Space Engineering from Politecnico di Milano.</p>
       <p class="bio-para">My current role as a System Budgets Engineer is focused on establishing and monitoring technical budgets, by closely collaborating with performance engineers and contractors. I am also in charge of supporting the requirements management and change management processes, within the framework of a 600-satellite constellation program.</p>
       <div class="bio-extra" id="bioExtra">
         <p class="bio-para">In my previous role, I was leading the development of advanced vision-based navigation techniques for close-proximity operations in space. This encompasses a broad variety of activities, ranging from the development of onboard software and project management to systems engineering and AIV/AIT support for a camera / star tracker flying on a small satellite mission.</p>
@@ -87,7 +130,7 @@
       </button>
     </section>
     <section id="projects">
-      <h2>Work & Projects</h2>
+      <h2>Work &amp; Projects</h2>
       <div class="accordion">
         <div class="accordion-item">
           <div class="accordion-header">SatCom <span>+</span></div>
@@ -103,9 +146,9 @@
           <div class="accordion-header">Vision-based navigation <span>+</span></div>
           <div class="accordion-content">
             <ul>
-              <li><a href="#">Paper X</a></li>
-              <li><a href="#">Tool Y</a></li>
-              <li><a href="#">Dataset Z</a></li>
+              <li><a href="#">CNN</a></li>
+              <li><a href="#">Star tracker</a></li>
+              <li><a href="#">Angles-only nav</a></li>
             </ul>
           </div>
         </div>
@@ -113,9 +156,9 @@
           <div class="accordion-header">Academia <span>+</span></div>
           <div class="accordion-content">
             <ul>
-              <li><a href="#">Publication 1</a></li>
-              <li><a href="#">Teaching Role</a></li>
-              <li><a href="#">Conference Talk</a></li>
+              <li><a href="#">Journal paper 1</a></li>
+              <li><a href="#">Conference paper 1</a></li>
+              <li><a href="#">Conference paper 2</a></li>
             </ul>
           </div>
         </div>
@@ -123,9 +166,9 @@
           <div class="accordion-header">SaaS <span>+</span></div>
           <div class="accordion-content">
             <ul>
-              <li><a href="#">SaaS Project 1</a></li>
-              <li><a href="#">SaaS Project 2</a></li>
-              <li><a href="#">SaaS Project 3</a></li>
+              <li><a href="#">SaaS project 1</a></li>
+              <li><a href="#">SaaS project 2</a></li>
+              <li><a href="#">SaaS project 3</a></li>
             </ul>
           </div>
         </div>
@@ -150,12 +193,15 @@
   </main>
   <footer>
     <div class="socials">
-      <a href="mailto:massimopiazza97@gmail.com"><img src="/squareospace/icons/email.svg" alt="Email"></a>
-      <a href="https://www.linkedin.com/in/mpiazza97/" target="_blank"><img src="/squareospace/icons/linkedin.svg" alt="LinkedIn"></a>
-      <a href="http://x.com/squareospace" target="_blank"><img src="/squareospace/icons/x.svg" alt="X"></a>
+      <a href="mailto:massimopiazza97@gmail.com"><img src="squareospace/icons/email.svg" alt="Email"></a>
+      <a href="https://www.linkedin.com/in/mpiazza97/" target="_blank"><img src="squareospace/icons/linkedin.svg" alt="LinkedIn"></a>
+      <a href="http://x.com/squareospace" target="_blank"><img src="squareospace/icons/x.svg" alt="X"></a>
     </div>
   </footer>
   <script>
+    // JavaScript for dynamic navigation and interactive elements
+
+    // Get CSS variables for navigation height and extra offset
     const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height'));
     const extraOffset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--extra-offset'));
     const indicator = document.getElementById('indicator');
@@ -171,20 +217,17 @@
 
     document.getElementById('toggleBio').addEventListener('click', () => {
       const bio = document.getElementById('bioExtra');
-      const btn = document.getElementById('toggleBio');
       const open = bio.classList.toggle('open');
-      btn.classList.toggle('open', open);
+      document.getElementById('toggleBio').classList.toggle('open', open);
     });
 
     links.forEach(link => {
       const href = link.getAttribute('href');
-      if (href.startsWith('#')) {
-        link.addEventListener('click', e => {
-          e.preventDefault();
-          const target = document.getElementById(href.substring(1));
-          window.scrollTo({ top: target.offsetTop - navHeight - extraOffset, behavior: 'smooth' });
-        });
-      }
+      if (href.startsWith('#')) link.addEventListener('click', e => {
+        e.preventDefault();
+        const target = document.getElementById(href.substring(1));
+        window.scrollTo({ top: target.offsetTop - navHeight - extraOffset, behavior: 'smooth' });
+      });
       link.addEventListener('click', () => {
         links.forEach(l => l.classList.remove('active'));
         link.classList.add('active');
@@ -199,10 +242,7 @@
         const viewportCenter = window.innerHeight / 2;
         let current = sections[0];
         sections.forEach(sec => {
-          const el = document.getElementById(sec.id);
-          if (el.getBoundingClientRect().top <= viewportCenter) {
-            current = sec;
-          }
+          if (document.getElementById(sec.id).getBoundingClientRect().top <= viewportCenter) current = sec;
         });
         links.forEach(l => l.classList.remove('active'));
         current.link.classList.add('active');
@@ -213,13 +253,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       const active = document.querySelector('nav .nav-link.active');
       if (active) updateIndicator(active);
-      document.querySelectorAll('.accordion-header').forEach(header => {
-        header.addEventListener('click', () => {
-          const content = header.nextElementSibling;
-          const open = content.classList.toggle('open');
-          header.classList.toggle('open', open);
-        });
-      });
+      document.querySelectorAll('.accordion-header').forEach(header => header.addEventListener('click', () => {
+        const content = header.nextElementSibling;
+        const open = content.classList.toggle('open');
+        header.classList.toggle('open', open);
+      }));
     });
   </script>
 </body>
