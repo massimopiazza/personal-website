@@ -1,19 +1,10 @@
 /**
  * Main JavaScript for Massimo Piazza personal site
- * - Defines ROOT_DIR for image paths
- * - Dynamically loads images
  * - Handles navigation, bio toggle, smooth scroll, and accordion interactions
  */
 
-// Root directory for all image assets
-const ROOT_DIR = '/Users/massimopiazza/Resume/Personal website/personal-website/squareospace/';
 
-// Wait until DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  // Dynamically load images based on data-src attribute
-  document.querySelectorAll('img[data-src]').forEach(img => {
-    img.src = ROOT_DIR + img.getAttribute('data-src');
-  });
+
 
   // Navigation indicator setup
   const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height'));
