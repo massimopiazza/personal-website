@@ -4,7 +4,8 @@
  */
 
 
-
+// Wait until DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
 
   // Navigation indicator setup
   const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height'));
