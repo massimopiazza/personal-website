@@ -8,16 +8,17 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div id="pageContent">
-    <!-- Navigation -->
-    <nav>
-      <a href="#about" class="nav-link active">About</a>
-      <a href="#projects" class="nav-link">Work & Projects</a>
-      <a href="#consulting" class="nav-link">Consulting</a>
-      <a href="#contact" class="nav-link">Contact</a>
-      <div class="indicator" id="indicator"></div>
-    </nav>
+  <!-- Navigation – moved outside sliding wrapper -->
+  <nav>
+    <a href="#about" class="nav-link active">About</a>
+    <a href="#projects" class="nav-link">Work & Projects</a>
+    <a href="#consulting" class="nav-link">Consulting</a>
+    <a href="#contact" class="nav-link">Contact</a>
+    <div class="indicator" id="indicator"></div>
+  </nav>
 
+  <!-- Only this wrapper slides left/right -->
+  <div id="pageContent">
     <main>
       <!-- About Section -->
       <section id="about">
@@ -104,16 +105,16 @@
         </form>
       </section>
     </main>
-
-    <!-- Footer with social links; icons loaded dynamically via JS -->
-    <footer>
-      <div class="socials">
-        <a href="mailto:massimopiazza97@gmail.com"><img src="icons/email.svg" alt="E"></a>
-        <a href="https://www.linkedin.com/in/mpiazza97/" target="_blank"><img src="icons/linkedin.svg" alt="L"></a>
-        <a href="http://x.com/squareospace" target="_blank"><img src="icons/x.svg" alt="X"></a>
-      </div>
-    </footer>
   </div>
+
+  <!-- Footer – also outside sliding wrapper -->
+  <footer>
+    <div class="socials">
+      <a href="mailto:massimopiazza97@gmail.com"><img src="icons/email.svg" alt="E"></a>
+      <a href="https://www.linkedin.com/in/mpiazza97/" target="_blank"><img src="icons/linkedin.svg" alt="L"></a>
+      <a href="http://x.com/squareospace" target="_blank"><img src="icons/x.svg" alt="X"></a>
+    </div>
+  </footer>
 
   <!-- Project Detail View -->
   <div id="projectDetail" class="detail-view">

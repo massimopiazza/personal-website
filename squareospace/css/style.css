@@ -16,20 +16,20 @@
   --nav-height: 60px;
   --footer-height: 60px;
   --extra-offset: 10px;
-  --accordion-width: 100%; /* full width on mobile */
-  --accordion-offset: 1.5rem; /* gap beyond line end */
+  --accordion-width: 100%;
+  --accordion-offset: 1.5rem;
   --button-size: 1.4rem;
-  --accordion-gap: 4px; /* subtract this to inset + button */
+  --accordion-gap: 4px;
   --detail-width: 100%;
-  --side-margin: 2rem; /* white margin when sliding/detail padding */
-  --content-max-width: 800px; /* matches your section max-width */
+  --side-margin: 2rem;
+  --content-max-width: 800px;
 }
 
 /* Responsive adjustments */
 @media (min-width: 768px) {
   :root {
     --accordion-width: 70%;
-    --detail-width: 40%;
+    --detail-width: 55%;
   }
 }
 
@@ -246,7 +246,7 @@ footer {
   justify-content: center;
   align-items: center;
 }
-.socials { display: flex; }
+.socials { display: flex; transition: transform 0.3s ease; }
 .socials a { margin: 0 0.5rem; }
 .socials img {
   width: 32px;
@@ -267,7 +267,7 @@ footer {
   transition: transform 0.3s ease;
   overflow-y: auto;
   z-index: 200;
-  padding: 3rem var(--side-margin);
+  padding: 5rem var(--side-margin);
 }
 .detail-view.open {
   transform: translateX(0);
@@ -294,8 +294,8 @@ footer {
 /* Close button centering */
 #closeDetail {
   position: absolute;
-  top: var(--side-margin);
-  left: var(--side-margin);
+  top: calc( var(--side-margin) - 1rem);
+  left: calc( var(--side-margin) - 1rem);
   background: #fff;
   border: 1px solid var(--accent);
   border-radius: 50%;

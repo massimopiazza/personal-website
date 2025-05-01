@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const detailView = document.getElementById('projectDetail');
   const detailContent = document.getElementById('detailContent');
   const closeBtn = document.getElementById('closeDetail');
+  const footerSocials = document.querySelector('footer .socials');
 
   document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
     link.addEventListener('click', e => {
@@ -114,10 +115,25 @@ document.addEventListener('DOMContentLoaded', () => {
     pageContent.classList.remove('slide');
     detailView.classList.remove('open');
     detailContent.innerHTML = '';
+    resetFooter();
   });
 
   function openDetail() {
     pageContent.classList.add('slide');
     detailView.classList.add('open');
+    shiftFooter();
+  }
+
+  function shiftFooter() {
+    // Only on desktop viewports
+    if (window.innerWidth >= 768) {
+      const detailWidth = detailView.getBoundingClientRect().width;
+      const shift = detailWidth / 2;
+      footerSocials.style.transform = `translateX(-${shift}px)`;
+    }
+  }
+
+  function resetFooter() {
+    footerSocials.style.transform = '';
   }
 });
