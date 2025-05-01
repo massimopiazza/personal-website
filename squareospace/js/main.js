@@ -1,12 +1,9 @@
 /**
  * Main JavaScript for Massimo Piazza personal site
- * - Handles navigation, bio toggle, smooth scroll, and accordion interactions
+ * - Handles navigation, bio toggle, smooth scroll, accordion, and project detail view
  */
 
-
-// Wait until DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-
   // Navigation indicator setup
   const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height'));
   const extraOffset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--extra-offset'));
@@ -17,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     link
   }));
 
-  // Update the position and width of the nav indicator
   function updateIndicator(elem) {
     const rect = elem.getBoundingClientRect();
     const navRect = document.querySelector('nav').getBoundingClientRect();
@@ -25,14 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
     indicator.style.width = rect.width + 'px';
   }
 
-  // Toggle biography expansion
+  // Bio toggle
   document.getElementById('toggleBio').addEventListener('click', () => {
     const bio = document.getElementById('bioExtra');
     const isOpen = bio.classList.toggle('open');
     document.getElementById('toggleBio').classList.toggle('open', isOpen);
   });
 
-  // Smooth scroll and active link handling
+  // Smooth scroll & active link
   links.forEach(link => {
     const href = link.getAttribute('href');
     if (href.startsWith('#')) {
@@ -52,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Update active link on scroll
   let scrollTimeout;
   window.addEventListener('scroll', () => {
     clearTimeout(scrollTimeout);
@@ -70,31 +65,59 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 50);
   });
 
-  // Initialize indicator
   const initial = document.querySelector('nav .nav-link.active');
   if (initial) updateIndicator(initial);
 
-  // Single-phase max-height accordion animation with moving separator
+  // Accordion animation
   document.querySelectorAll('.accordion-header').forEach(header => {
     header.addEventListener('click', () => {
       const content = header.nextElementSibling;
       const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
-
       if (isOpen) {
-        // Collapse: from current height to zero
         content.style.maxHeight = content.scrollHeight + 'px';
-        void content.offsetHeight; // force reflow
+        void content.offsetHeight;
         content.style.maxHeight = '0';
-        // Reset moving separator line
         header.style.setProperty('--line-move', '0px');
       } else {
-        // Expand: to full content height
         content.style.maxHeight = content.scrollHeight + 'px';
-        // Move separator line down with content
         header.style.setProperty('--line-move', content.scrollHeight + 'px');
       }
-
       header.classList.toggle('open', !isOpen);
     });
   });
+
+  // Project detail view setup
+  const pageContent = document.getElementById('pageContent');
+  const detailView = document.getElementById('projectDetail');
+  const detailContent = document.getElementById('detailContent');
+  const closeBtn = document.getElementById('closeDetail');
+
+  document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const mdPath = link.getAttribute('data-project');
+      fetch(mdPath)
+        .then(response => response.ok ? response.text() : Promise.reject('Failed to load'))
+        .then(md => {
+          detailContent.innerHTML = marked.parse(md);
+          openDetail();
+        })
+        .catch(err => {
+          detailContent.innerHTML = '<p>Error loading project details. Please run the site via an HTTP server (e.g., python3 -m http.server).</p>';
+          openDetail();
+          console.error(err);
+        });
+    });
+  });
+
+  closeBtn.addEventListener('click', () => {
+    pageContent.classList.remove('slide');
+    detailView.classList.remove('open');
+    detailContent.innerHTML = '';
+  });
+
+  function openDetail() {
+    pageContent.classList.add('slide');
+    detailView.classList.add('open');
+  }
 });

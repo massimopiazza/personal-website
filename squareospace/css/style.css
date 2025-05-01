@@ -20,11 +20,17 @@
   --accordion-offset: 1.5rem; /* gap beyond line end */
   --button-size: 1.4rem;
   --accordion-gap: 4px; /* subtract this to inset + button */
+  --detail-width: 100%;
+  --side-margin: 2rem; /* white margin when sliding/detail padding */
+  --content-max-width: 800px; /* matches your section max-width */
 }
 
 /* Responsive adjustments */
 @media (min-width: 768px) {
-  :root { --accordion-width: 70%; }
+  :root {
+    --accordion-width: 70%;
+    --detail-width: 40%;
+  }
 }
 
 /* Global resets */
@@ -42,6 +48,14 @@ body {
   flex-direction: column;
   min-height: 100vh;
   scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+/* Wrapper for sliding */
+#pageContent {
+  transition: transform 0.3s ease;
+  position: relative;
+  width: 100%;
 }
 
 /* Navigation bar */
@@ -83,7 +97,7 @@ main {
   flex: 1;
 }
 section {
-  max-width: 800px;
+  max-width: var(--content-max-width);
   margin: 2rem auto;
   padding: 0 1rem;
   scroll-margin-top: calc(var(--nav-height) + var(--extra-offset));
@@ -156,7 +170,6 @@ h2 {
   width: var(--accordion-width);
   border-bottom: 1px solid #ddd;
 }
-/* Moving separator line */
 .accordion-header::after {
   content: '';
   position: absolute;
@@ -167,7 +180,6 @@ h2 {
   transform: translateY(var(--line-move, 0));
   transition: transform 0.5s ease;
 }
-
 .accordion-header span {
   display: inline-flex;
   align-items: center;
@@ -180,13 +192,11 @@ h2 {
   color: var(--accent);
 }
 .accordion-header.open span { transform: rotate(45deg); }
-
 .accordion-content {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.5s ease;
 }
-/* Move the gap inside the list so content itself stays static */
 .accordion-content ul {
   margin-top: 1.2rem;
   list-style: disc inside;
@@ -242,4 +252,60 @@ footer {
   width: 32px;
   height: 32px;
   filter: invert(100%);
+}
+
+/* Detail-view panel */
+.detail-view {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--detail-width);
+  height: 100%;
+  background: #fff;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  z-index: 200;
+  padding: 3rem var(--side-margin);
+}
+.detail-view.open {
+  transform: translateX(0);
+}
+
+/* Slide pageContent when detail open */
+@media (min-width: 768px) {
+  /* shift content so that your centered layout's left edge sits at the side margin */
+  #pageContent.slide {
+    transform: translateX(
+      calc(
+        var(--side-margin)
+        - ((100vw - var(--content-max-width)) / 2)
+      )
+    );
+  }
+}
+@media (max-width: 767px) {
+  #pageContent.slide {
+    transform: translateX(-100%);
+  }
+}
+
+/* Close button centering */
+#closeDetail {
+  position: absolute;
+  top: var(--side-margin);
+  left: var(--side-margin);
+  background: #fff;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 300;
+  color: var(--accent);
 }
