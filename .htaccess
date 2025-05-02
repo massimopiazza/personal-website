@@ -6,16 +6,16 @@
 # BEGIN Newfold Browser Cache
 <IfModule mod_expires.c>
 	ExpiresActive On
-	ExpiresDefault "access plus 24 hours"
-	ExpiresByType text/html "access plus 2 hours"
-	ExpiresByType image/jpg "access plus 24 hours"
-	ExpiresByType image/jpeg "access plus 24 hours"
-	ExpiresByType image/gif "access plus 24 hours"
-	ExpiresByType image/png "access plus 24 hours"
-	ExpiresByType text/css "access plus 24 hours"
-	ExpiresByType text/javascript "access plus 24 hours"
-	ExpiresByType application/pdf "access plus 1 week"
-	ExpiresByType image/x-icon "access plus 1 year"
+	ExpiresDefault "access plus 5 minutes"
+	ExpiresByType text/html "access plus 5 minutes"
+	ExpiresByType image/jpg "access plus 5 minutes"
+	ExpiresByType image/jpeg "access plus 5 minutes"
+	ExpiresByType image/gif "access plus 5 minutes"
+	ExpiresByType image/png "access plus 5 minutes"
+	ExpiresByType text/css "access plus 5 minutes"
+	ExpiresByType text/javascript "access plus 5 minutes"
+	ExpiresByType application/pdf "access plus 5 minutes"
+	ExpiresByType image/x-icon "access plus 5 minutes"
 </IfModule>
 # END Newfold Browser Cache
 
@@ -43,16 +43,16 @@
 # Any changes to the directives between these markers will be overwritten.
 <IfModule mod_expires.c>
 	ExpiresActive On
-	ExpiresByType image/jpg "access plus 1 year"
-	ExpiresByType image/jpeg "access plus 1 year"
-	ExpiresByType image/gif "access plus 1 year"
-	ExpiresByType image/png "access plus 1 year"
-	ExpiresByType text/css "access plus 1 month"
-	ExpiresByType application/pdf "access plus 1 month"
-	ExpiresByType text/javascript "access plus 1 month"
-	ExpiresByType text/html "access plus 2 hours"
-	ExpiresByType image/x-icon "access plus 1 year"
-	ExpiresDefault "access plus 6 hours"
+	ExpiresByType image/jpg "access plus 5 minutes"
+	ExpiresByType image/jpeg "access plus 5 minutes"
+	ExpiresByType image/gif "access plus 5 minutes"
+	ExpiresByType image/png "access plus 5 minutes"
+	ExpiresByType text/css "access plus 5 minutes"
+	ExpiresByType application/pdf "access plus 5 minutes"
+	ExpiresByType text/javascript "access plus 5 minutes"
+	ExpiresByType text/html "access plus 5 minutes"
+	ExpiresByType image/x-icon "access plus 5 minutes"
+	ExpiresDefault "access plus 5 minutes"
 </IfModule>
 Options -Indexes
 <IfModule mod_headers.c>
@@ -69,6 +69,16 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
 # END WordPress
+
+# --------------------------------------------------------------------
+# Limit caching for Markdown files to 1 minute
+# --------------------------------------------------------------------
+<IfModule mod_expires.c>
+  <FilesMatch "\.(md|mdx)$">
+    ExpiresActive On
+    ExpiresDefault "access plus 1 minute"
+  </FilesMatch>
+</IfModule>
 
 # php -- BEGIN cPanel-generated handler, do not edit
 # Set the “ea-php82” package as the default “PHP” programming language.

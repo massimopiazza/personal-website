@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fetch(mdPath)
         .then(response => response.ok ? response.text() : Promise.reject('Failed to load'))
         .then(md => {
+          // Parse .md and .mdx uniformly as Markdown
           detailContent.innerHTML = marked.parse(md);
           openDetail();
         })
