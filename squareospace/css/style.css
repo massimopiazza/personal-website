@@ -234,6 +234,12 @@ button {
   font-family: 'TitleDefense', sans-serif;
 }
 
+/* Contact form send button specific styling */
+#contact button {
+  font-size: 1.2rem;
+  border-radius: 2rem;
+}
+
 /* Footer and social icons */
 footer {
   position: fixed;
