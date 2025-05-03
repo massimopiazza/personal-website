@@ -218,9 +218,17 @@ h2 {
 
 /* Contact form */
 #contact { margin-top: 4rem; }
-form { display: flex; flex-direction: column; }
+#contact form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--accordion-width);
+  margin: 0;
+}
 label { margin-bottom: 0.5rem; font-weight: bold; }
-input, textarea {
+#contact form input,
+#contact form textarea {
+  width: 100%;
   margin-bottom: 1rem;
   padding: 0.5rem;
   font-family: 'BodyDefense', sans-serif;
@@ -238,6 +246,8 @@ button {
 #contact button {
   font-size: 1.2rem;
   border-radius: 2rem;
+  width: 35%;
+  margin: 0 auto;
 }
 
 /* Footer and social icons */
