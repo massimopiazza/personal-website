@@ -117,16 +117,20 @@
   <!-- Footer – also outside sliding wrapper -->
   <footer>
     <div class="socials">
-      <a href="mailto:massimopiazza97@gmail.com"><img src="icons/email.svg" alt="E"></a>
-      <a href="https://www.linkedin.com/in/mpiazza97/" target="_blank"><img src="icons/linkedin.svg" alt="L"></a>
-      <a href="http://x.com/squareospace" target="_blank"><img src="icons/x.svg" alt="X"></a>
+      <a href="mailto:massimopiazza97@gmail.com"><img src="icons/logo/email.svg" alt="E"></a>
+      <a href="https://www.linkedin.com/in/mpiazza97/" target="_blank"><img src="icons/logo/linkedin.svg" alt="L"></a>
+      <a href="http://x.com/squareospace" target="_blank"><img src="icons/logo/x.svg" alt="X"></a>
     </div>
   </footer>
 
   <!-- Project Detail View -->
   <div id="projectDetail" class="detail-view">
-    <button id="closeDetail">X</button>
-    <div id="detailContent"></div>
+    <div class="detail-header">
+      <button id="closeDetail">X</button>
+      <span id="detailTitle"></span>
+    </div>
+
+    <div id="detailContent" class="detail-body"></div>
   </div>
 
   <!-- Load marked library for markdown parsing -->

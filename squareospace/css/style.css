@@ -244,10 +244,10 @@ button {
 
 /* Contact form send button specific styling */
 #contact button {
-  font-size: 1.2rem;
+  font-size: 1rem;
   border-radius: 2rem;
-  width: 35%;
-  margin: 0 auto;
+  width: 25%;
+  margin: 0 left;
 }
 
 /* Footer and social icons */
@@ -281,12 +281,51 @@ footer {
   box-shadow: -2px 0 5px rgba(0,0,0,0.3);
   transform: translateX(100%);
   transition: transform 0.3s ease;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   z-index: 200;
-  padding: 5rem var(--side-margin);
 }
 .detail-view.open {
   transform: translateX(0);
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  height: var(--nav-height);
+  padding: 0 var(--side-margin);
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 210;
+  transition: box-shadow 0.3s ease;
+}
+.detail-header::after {
+  content: '';
+  position: absolute;
+  left: var(--extra-offset);
+  right: var(--extra-offset);
+  bottom: 0;
+  border-bottom: 1px solid #ddd;
+}
+.detail-header #closeDetail {
+  margin-right: 1rem;
+}
+.detail-header #detailTitle {
+  font-family: 'TitleDefense', sans-serif;
+  font-size: 2rem;
+  color: var(--accent);
+  margin-left: 2rem;
+}
+.detail-header.scrolled {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.detail-body {
+  padding: var(--extra-offset) var(--side-margin) var(--side-margin) var(--side-margin);
+  overflow-y: auto;
+  flex: 1;
 }
 
 /* Slide pageContent when detail open */
@@ -310,7 +349,7 @@ footer {
 /* Close button centering */
 #closeDetail {
   position: absolute;
-  top: calc( var(--side-margin) - 1rem);
+  top: calc( var(--side-margin) - 1.1rem);
   left: calc( var(--side-margin) - 1rem);
   background: #fff;
   border: 1px solid var(--accent);

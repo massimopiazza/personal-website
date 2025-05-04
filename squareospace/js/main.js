@@ -92,10 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const detailContent = document.getElementById('detailContent');
   const closeBtn = document.getElementById('closeDetail');
   const footerSocials = document.querySelector('footer .socials');
+  const detailHeader = document.querySelector('.detail-header');
+
 
   document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
     link.addEventListener('click', e => {
       e.preventDefault();
+      const title = link.textContent;
+      document.getElementById('detailTitle').textContent = title;
       const mdPath = link.getAttribute('data-project');
       fetch(mdPath)
         .then(response => response.ok ? response.text() : Promise.reject('Failed to load'))
@@ -117,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     detailView.classList.remove('open');
     detailContent.innerHTML = '';
     resetFooter();
+    detailHeader.classList.remove('scrolled');
   });
 
   function openDetail() {
