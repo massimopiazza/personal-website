@@ -364,3 +364,34 @@ footer {
   z-index: 300;
   color: var(--accent);
 }
+
+/* Download resume alignment */
+.download-resume-wrapper {
+  width: var(--accordion-width);
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.download-resume {
+  display: inline-flex;
+  align-items: center;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+
+/* Download resume alignment */
+.download-resume-wrapper {
+width: var(–accordion-width);
+margin-top: 0.75rem;
+display: flex;
+justify-content: flex-end;
+}
+
+.download-resume {
+display: inline-flex;
+align-items: center;
+color: var(–accent);
+text-decoration: none;
+}
