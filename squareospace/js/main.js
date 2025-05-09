@@ -107,6 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
     detailTitle.style.fontSize = initialSize * scale + 'px';
   }
 
+  // Adjust font size on detail view resize
+  window.addEventListener('resize', () => {
+    if (detailView.classList.contains('open')) {
+      adjustTitleFontSize();
+    }
+  });
+
 
   document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
     link.addEventListener('click', e => {
