@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       header.classList.toggle('open', !isOpen);
       if (isOpen) {
-        expandAllBtn.style.display = '';
+        expandAllBtn.classList.remove('hidden');
       }
     });
   });
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
           header.classList.add('open');
         }
       });
-      expandAllBtn.style.display = 'none';
+    expandAllBtn.classList.add('hidden');
     });
 
   // Title font adjustment to fit in one line

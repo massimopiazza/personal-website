@@ -12,7 +12,9 @@
 
 /* Root-level CSS variables */
 :root {
-  --accent: rgb(152,0,0);
+  --accent-rgb: 152, 0, 0;
+  --accent: rgb(var(--accent-rgb));
+  --accent-hover: rgba(var(--accent-rgb), 0.15);
   --nav-height: 60px;
   --footer-height: 60px;
   --extra-offset: 10px;
@@ -148,7 +150,15 @@ h2 {
   font-family: 'BodyDefense', sans-serif;
   color: #333;
   text-transform: lowercase;
-  transition: opacity 0.3s ease;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+}
+
+
+.hover-accent-overlay {
+ transition: background-color 0.3s ease;
+}
+.hover-accent-overlay:hover {
+ background-color: var(--accent-hover);
 }
 .toggle-bio.open .toggle-text { opacity: 0; }
 
@@ -412,4 +422,10 @@ text-decoration: none;
   font-size: 0.7rem;
   cursor: pointer;
   margin-left: 0.1rem;
+  transition: opacity 0.3s ease;
+}
+
+.expand-all-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
