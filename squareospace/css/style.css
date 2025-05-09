@@ -317,6 +317,11 @@ footer {
   font-size: 2rem;
   color: var(--accent);
   margin-left: 2rem;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .detail-header.scrolled {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);

@@ -94,6 +94,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const footerSocials = document.querySelector('footer .socials');
   const detailHeader = document.querySelector('.detail-header');
 
+  // Title font adjustment to fit in one line
+  const detailTitle = document.getElementById('detailTitle');
+  function adjustTitleFontSize() {
+    // Reset to original font size
+    detailTitle.style.fontSize = '';
+    const containerWidth = detailTitle.clientWidth;
+    const scrollWidth = detailTitle.scrollWidth;
+    if (scrollWidth <= containerWidth) return;
+    const initialSize = parseFloat(getComputedStyle(detailTitle).fontSize);
+    const scale = Math.max(containerWidth / scrollWidth, 0.6);
+    detailTitle.style.fontSize = initialSize * scale + 'px';
+  }
+
 
   document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
     link.addEventListener('click', e => {
@@ -107,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
           // Parse .md and .mdx uniformly as Markdown
           detailContent.innerHTML = marked.parse(md);
           openDetail();
+          adjustTitleFontSize();
         })
         .catch(err => {
           detailContent.innerHTML = '<p>Error loading project details. Please run the site via an HTTP server (e.g., python3 -m http.server).</p>';
