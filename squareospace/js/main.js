@@ -4,6 +4,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  const expandAllBtn = document.getElementById('expandAll');
   // Navigation indicator setup
   const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height'));
   const extraOffset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--extra-offset'));
@@ -83,6 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
         header.style.setProperty('--line-move', content.scrollHeight + 'px');
       }
       header.classList.toggle('open', !isOpen);
+      if (isOpen) {
+        expandAllBtn.style.display = '';
+      }
     });
   });
 
@@ -93,6 +97,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeBtn = document.getElementById('closeDetail');
   const footerSocials = document.querySelector('footer .socials');
   const detailHeader = document.querySelector('.detail-header');
+  
+    // Expand All button handler
+    expandAllBtn.addEventListener('click', () => {
+      document.querySelectorAll('.accordion-item').forEach(item => {
+        const header = item.querySelector('.accordion-header');
+        const content = item.querySelector('.accordion-content');
+        const isOpen = header.classList.contains('open');
+        if (!isOpen) {
+          content.style.maxHeight = content.scrollHeight + 'px';
+          header.style.setProperty('--line-move', content.scrollHeight + 'px');
+          header.classList.add('open');
+        }
+      });
+      expandAllBtn.style.display = 'none';
+    });
 
   // Title font adjustment to fit in one line
   const detailTitle = document.getElementById('detailTitle');

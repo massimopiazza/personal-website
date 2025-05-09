@@ -400,3 +400,16 @@ align-items: center;
 color: var(–accent);
 text-decoration: none;
 }
+
+/* Expand All button */
+.expand-all-btn {
+  border: 1.75px solid var(--accent);
+  border-radius: 0.45rem;
+  background: none;
+  color: var(--accent);
+  padding: 0.1rem 0.3rem;
+  font-family: 'BodyDefense', sans-serif;
+  font-size: 0.7rem;
+  cursor: pointer;
+  margin-left: 0.1rem;
+}
