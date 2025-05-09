@@ -14,7 +14,7 @@
 :root {
   --accent-rgb: 152, 0, 0;
   --accent: rgb(var(--accent-rgb));
-  --accent-hover: rgba(var(--accent-rgb), 0.15);
+  --accent-hover: rgba(0,0,0, 0.15); /*rgba(var(--accent-rgb), 0.15)*/
   --nav-height: 60px;
   --footer-height: 60px;
   --extra-offset: 10px;
@@ -25,6 +25,9 @@
   --detail-width: 100%;
   --side-margin: 2rem;
   --content-max-width: 800px;
+  --dock-max-scale: 1.75;
+  --dock-min-scale: 1;
+  --dock-distance: 64px;
 }
 
 /* Responsive adjustments */
@@ -273,11 +276,32 @@ footer {
   align-items: center;
 }
 .socials { display: flex; transition: transform 0.3s ease; }
-.socials a { margin: 0 0.5rem; }
+.socials a {
+  margin: 0 0.5rem;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.0rem;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+.socials a:hover {
+  background-color: rgba(0, 0, 0, 0.15);
+}
 .socials img {
   width: 32px;
   height: 32px;
   filter: invert(100%);
+  transition: filter 0.3s ease, transform 0.1s ease;
+  transform-origin: center center;
+}
+
+/* Accent overlay color on hover for social icons */
+.socials a:hover img {
+  /* Transform the white SVG shape into the accent color (#980000) */
+  /* Transformation numerically calculated using https://codepen.io/sosuke/pen/Pjoqqp */
+  filter: brightness(0) saturate(100%) invert(77%) sepia(16%) saturate(611%) hue-rotate(315deg) brightness(93%) contrast(74%);
 }
 
 /* Detail-view panel */
