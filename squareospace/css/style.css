@@ -298,10 +298,12 @@ footer {
 }
 
 /* Accent overlay color on hover for social icons */
-.socials a:hover img {
-  /* Transform the white SVG shape into the accent color (#980000) */
-  /* Transformation numerically calculated using https://codepen.io/sosuke/pen/Pjoqqp */
-  filter: brightness(0) saturate(100%) invert(77%) sepia(16%) saturate(611%) hue-rotate(315deg) brightness(93%) contrast(74%);
+@media (hover: hover) and (pointer: fine) {
+  .socials a:hover img {
+    /* Transform the white SVG shape into the accent color (#980000) */
+    /* Transformation numerically calculated using https://codepen.io/sosuke/pen/Pjoqqp */
+    filter: brightness(0) saturate(100%) invert(77%) sepia(16%) saturate(611%) hue-rotate(315deg) brightness(93%) contrast(74%);
+  }
 }
 
 /* Detail-view panel */

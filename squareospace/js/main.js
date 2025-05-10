@@ -183,26 +183,28 @@ document.addEventListener('DOMContentLoaded', () => {
     footerSocials.style.transform = '';
   }
 
-  // Dock magnification effect
-  const dock = document.querySelector('.socials');
-  const dockIcons = Array.from(dock.querySelectorAll('img'));
-  const maxScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dock-max-scale')) || 1.5;
-  const minScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dock-min-scale')) || 1;
-  const dockDistance = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dock-distance')) || 100;
+  // Dock magnification effect (hover-capable devices only)
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const dock = document.querySelector('.socials');
+    const dockIcons = Array.from(dock.querySelectorAll('img'));
+    const maxScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dock-max-scale')) || 1.5;
+    const minScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dock-min-scale')) || 1;
+    const dockDistance = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dock-distance')) || 100;
 
-  dock.addEventListener('mousemove', (e) => {
-    dockIcons.forEach((icon) => {
-      const rect = icon.getBoundingClientRect();
-      const iconCenterX = rect.left + rect.width / 2;
-      const distance = Math.min(Math.abs(e.clientX - iconCenterX), dockDistance);
-      const scale = minScale + (maxScale - minScale) * (1 - distance / dockDistance);
-      icon.style.transform = `scale(${scale})`;
+    dock.addEventListener('mousemove', (e) => {
+      dockIcons.forEach((icon) => {
+        const rect = icon.getBoundingClientRect();
+        const iconCenterX = rect.left + rect.width / 2;
+        const distance = Math.min(Math.abs(e.clientX - iconCenterX), dockDistance);
+        const scale = minScale + (maxScale - minScale) * (1 - distance / dockDistance);
+        icon.style.transform = `scale(${scale})`;
+      });
     });
-  });
 
-  dock.addEventListener('mouseleave', () => {
-    dockIcons.forEach((icon) => {
-      icon.style.transform = '';
+    dock.addEventListener('mouseleave', () => {
+      dockIcons.forEach((icon) => {
+        icon.style.transform = '';
+      });
     });
-  });
+  }
 });
