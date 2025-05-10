@@ -111,6 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     expandAllBtn.classList.add('hidden');
+
+    // Scroll to Work & Projects section
+    const projectsSection = document.getElementById('projects');
+    window.scrollTo({
+      top: projectsSection.offsetTop - navHeight - extraOffset,
+      behavior: 'smooth'
+    });
     });
 
   // Title font adjustment to fit in one line
@@ -145,6 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(md => {
           // Parse .md and .mdx uniformly as Markdown
           detailContent.innerHTML = marked.parse(md);
+          // Ensure links open in new tab
+          detailContent.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
           openDetail();
           adjustTitleFontSize();
         })

@@ -297,6 +297,11 @@ footer {
   transform-origin: center center;
 }
 
+
+.socials.hovering img {
+transition: filter 0.3s ease, transform 0s ease;
+}
+
 /* Accent overlay color on hover for social icons */
 @media (hover: hover) and (pointer: fine) {
   .socials a:hover img {
