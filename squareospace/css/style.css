@@ -15,6 +15,7 @@
   --accent-rgb: 152, 0, 0;
   --accent: rgb(var(--accent-rgb));
   --accent-hover: rgba(0,0,0, 0.15); /*rgba(var(--accent-rgb), 0.15)*/
+  --accent-hover-md-url: rgb(201, 163, 161);
   --nav-height: 60px;
   --footer-height: 60px;
   --extra-offset: 10px;
@@ -460,3 +461,82 @@ text-decoration: none;
   opacity: 0;
   pointer-events: none;
 }
+
+
+/****************************/
+/* MARKDOWN RENDERING STYLE */
+/****************************/
+
+.detail-body ul,
+.detail-body ol {
+  padding-left: 1.5rem; /* indent list levels for readability */
+  margin-bottom: 1rem;  /* add space below lists */
+}
+
+/* Add spacing between individual list items + justified text */
+.detail-body li {
+  margin-bottom: 0.5rem;
+  text-align: justify;
+}
+
+/* Ensure paragraphs have bottom margin for proper text flow + justified text */
+.detail-body p {
+  margin-bottom: 1rem;
+  text-align: justify;
+}
+
+/* Style fenced code blocks with background, padding, and scroll */
+.detail-body pre {
+  background-color: #f6f8fa; /* light gray background for contrast */
+  padding: 1rem;             /* inner padding for readability */
+  overflow-x: auto;          /* allow horizontal scrolling for long lines */
+}
+
+/* Style inline code snippets for emphasis */
+.detail-body code {
+  background-color: #f6f8fa;           /* match code block background */
+  padding: 0.2rem 0.4rem;              /* small padding around text */
+  border-radius: 3px;                  /* subtle rounded corners */
+}
+
+/* Style markdown links to use the site's accent color */
+.detail-body a {
+color: var(--accent);           /* use the defined accent color */
+text-decoration: underline;     /* underline for clarity */
+}
+
+/* Hover state for markdown links */
+.detail-body a:hover {
+color: var(--accent-hover-md-url);     /* slight darker shade on hover */
+}
+
+/* Center figures and captions */
+.detail-body figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem 0;
+}
+.detail-body figure figcaption {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+/* Center figures and captions */
+.detail-body figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem 0;
+}
+.detail-body figure figcaption {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+.detail-body figure figcaption > div {
+  margin: 0 auto;
+}
+
+/***********************************/
+/* End of MARKDOWN RENDERING STYLE */
+/***********************************/

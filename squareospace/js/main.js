@@ -133,10 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
     detailTitle.style.fontSize = initialSize * scale + 'px';
   }
 
-  // Adjust font size on detail view resize
+// Adjust font size and re-center footer icons on detail view resize
   window.addEventListener('resize', () => {
     if (detailView.classList.contains('open')) {
       adjustTitleFontSize();
+      shiftFooter();
     }
   });
 
