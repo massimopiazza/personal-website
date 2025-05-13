@@ -14,7 +14,7 @@
 :root {
   --accent-rgb: 152, 0, 0;
   --accent: rgb(var(--accent-rgb));
-  --accent-hover: rgba(0,0,0, 0.15); /*rgba(var(--accent-rgb), 0.15)*/
+  --accent-hover: rgba(0,0,0, 0.10); /*rgba(var(--accent-rgb), 0.15)*/
   --accent-hover-md-url: rgb(201, 163, 161);
   --nav-height: 60px;
   --footer-height: 60px;
@@ -25,6 +25,7 @@
   --accordion-gap: 4px;
   --detail-width: 100%;
   --side-margin: 2rem;
+  --side-margin-mobile: 0.75rem;
   --content-max-width: 800px;
   --dock-max-scale: 1.75;
   --dock-min-scale: 1;
@@ -204,6 +205,7 @@ h2 {
   transition: transform 0.5s ease;
   transform-origin: center center;
   color: var(--accent);
+  transition: background-color 0.3s ease;
 }
 .accordion-header.open span { transform: rotate(45deg); }
 .accordion-content {
@@ -412,7 +414,13 @@ transition: filter 0.3s ease, transform 0s ease;
   color: var(--accent);
 }
 
+#closeDetail:hover {
+  background-color: var(--accent-hover);
+}
+
+
 /* Download resume alignment */
+
 .download-resume-wrapper {
   width: var(--accordion-width);
   margin-top: 1.5rem;
@@ -539,4 +547,9 @@ color: var(--accent-hover-md-url);     /* slight darker shade on hover */
 
 /***********************************/
 /* End of MARKDOWN RENDERING STYLE */
+@media (max-width: 767px) {
+  .detail-body {
+    padding: var(--extra-offset) var(--side-margin-mobile) var(--side-margin) var(--side-margin-mobile);
+  }
+}
 /***********************************/
