@@ -25,11 +25,12 @@
   --accordion-gap: 4px;
   --detail-width: 100%;
   --side-margin: 2rem;
-  --side-margin-mobile: 0.75rem;
+  --side-margin-mobile: 1rem;
   --content-max-width: 800px;
   --dock-max-scale: 1.75;
   --dock-min-scale: 1;
   --dock-distance: 64px;
+  --spinner-size: 96px;
 }
 
 /* Responsive adjustments */
@@ -153,6 +154,7 @@ h2 {
 .toggle-text {
   margin-left: 0.5rem;
   font-family: 'BodyDefense', sans-serif;
+  font-size: 0.75rem;
   color: #333;
   text-transform: lowercase;
   transition: background-color 0.3s ease, opacity 0.3s ease;
@@ -471,6 +473,42 @@ text-decoration: none;
 }
 
 
+@media (max-width: 767px) {
+  .detail-body {
+    padding: var(--extra-offset) var(--side-margin-mobile) var(--side-margin) var(--side-margin-mobile);
+  }
+}
+
+
+/* Spinner styling */
+.spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  margin: calc(var(--spinner-size) / -2) 0 0 calc(var(--spinner-size) / -2);
+  border: 4px solid rgba(0,0,0,0.1);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 999;
+  display: block;
+}
+
+@keyframes spin {
+to { transform: rotate(360deg); }
+}
+
+/* Ensure hidden spinner is hidden */
+.spinner.hidden {
+display: none;
+}
+
+/***********************************/
+
+
+
 /****************************/
 /* MARKDOWN RENDERING STYLE */
 /****************************/
@@ -547,9 +585,3 @@ color: var(--accent-hover-md-url);     /* slight darker shade on hover */
 
 /***********************************/
 /* End of MARKDOWN RENDERING STYLE */
-@media (max-width: 767px) {
-  .detail-body {
-    padding: var(--extra-offset) var(--side-margin-mobile) var(--side-margin) var(--side-margin-mobile);
-  }
-}
-/***********************************/
