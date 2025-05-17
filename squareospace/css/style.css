@@ -583,5 +583,22 @@ color: var(--accent-hover-md-url);     /* slight darker shade on hover */
   margin: 0 auto;
 }
 
+
+/* Table styling for markdown tables */
+.detail-body table {
+  border-collapse: separate;
+  border-spacing: 0.25rem 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.detail-body th,
+.detail-body td {
+  padding: 0.5rem 0.5rem;
+}
+
+.detail-body th {
+  color: var(--accent);
+}
+
 /***********************************/
 /* End of MARKDOWN RENDERING STYLE */
