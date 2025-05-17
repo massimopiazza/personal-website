@@ -113,12 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     expandAllBtn.classList.add('hidden');
 
-    // Scroll to Work & Projects section
-    const projectsSection = document.getElementById('projects');
-    window.scrollTo({
-      top: projectsSection.offsetTop - navHeight - extraOffset,
-      behavior: 'smooth'
-    });
+    // Delay scroll until after expand animation almost completes (CSS transition duration: 0.3 sec)
+    setTimeout(() => {
+      const projectsSection = document.getElementById('projects');
+      window.scrollTo({
+        top: projectsSection.offsetTop - navHeight - extraOffset,
+        behavior: 'smooth'
+      });
+    }, 200);
     });
 
   // Title font adjustment to fit in one line
