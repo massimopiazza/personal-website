@@ -607,10 +607,12 @@ color: var(--accent-hover-md-url);     /* slight darker shade on hover */
 /* Everboard carousel styles */
 .header_carrousel {
   width: 380px;
-  height: 630px;
-  margin-top: 1rem;
-  float: right;
+  aspect-ratio: 380 / 630;
+  margin: 1rem 0;
   overflow: hidden;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .header_carrousel .c_iphone {
   width: 70%;

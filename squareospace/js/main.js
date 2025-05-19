@@ -195,13 +195,81 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  closeBtn.addEventListener('click', () => {
+  function closeDetail() {
     pageContent.classList.remove('slide');
     detailView.classList.remove('open');
     detailContent.innerHTML = '';
     resetFooter();
     detailHeader.classList.remove('scrolled');
-  });
+    // clear any inline drag transforms and transitions
+    detailView.style.transform = '';
+    pageContent.style.transform = '';
+    detailView.style.transition = '';
+    pageContent.style.transition = '';
+  }
+
+  closeBtn.addEventListener('click', closeDetail);
+
+  // Interactive swipe-to-close: drag detail panel by left edge and close if threshold exceeded
+  (function setupInteractiveSwipeToClose() {
+    let startX = 0, startY = 0, initialPageLeft = 0;
+    let dragging = false;
+    let thresholdPx = 0;
+
+    detailView.addEventListener('touchstart', e => {
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      const panelRect = detailView.getBoundingClientRect();
+      const edgeRegion = 20; // px from left edge of detail panel
+      // Start drag only if touch begins at the panel's left margin
+      if (touch.clientX >= panelRect.left && touch.clientX <= panelRect.left + edgeRegion) {
+        dragging = true;
+        startX = touch.clientX;
+        startY = touch.clientY;
+        // record the current pageContent left offset
+        initialPageLeft = pageContent.getBoundingClientRect().left;
+        thresholdPx = detailView.offsetWidth * 0.3;
+        // disable transitions for direct finger-follow movement
+        detailView.style.transition = 'none';
+        pageContent.style.transition = 'none';
+      }
+    });
+
+    detailView.addEventListener('touchmove', e => {
+      if (!dragging) return;
+      const touch = e.touches[0];
+      const dx = touch.clientX - startX;
+      const dy = touch.clientY - startY;
+      // Ignore mostly vertical drags
+      if (Math.abs(dy) > Math.abs(dx)) return;
+      if (dx > 0) {
+        detailView.style.transform = `translateX(${dx}px)`;
+        pageContent.style.transform = `translateX(${initialPageLeft + dx}px)`;
+      }
+    });
+
+    detailView.addEventListener('touchend', e => {
+      if (!dragging) return;
+      dragging = false;
+      const endX = e.changedTouches[0].clientX;
+      const dx = endX - startX;
+      // restore CSS transition behavior
+      detailView.style.transition = '';
+      pageContent.style.transition = '';
+      if (dx > thresholdPx) {
+        // animate panel off-screen, then finalize close
+        detailView.style.transform = `translateX(${detailView.offsetWidth}px)`;
+        pageContent.style.transform = `translateX(${initialPageLeft + detailView.offsetWidth}px)`;
+        setTimeout(() => {
+          closeDetail();
+        }, 300);
+      } else {
+        // snap back to original position
+        detailView.style.transform = '';
+        pageContent.style.transform = '';
+      }
+    });
+  })();
 
   function openDetail() {
     pageContent.classList.add('slide');

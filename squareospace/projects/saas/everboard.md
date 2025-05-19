@@ -1,7 +1,7 @@
 <div class="multicol-md">
 
   <div class="multicol-md-text">
-    <img src="img/everboard_icon.svg" alt="Everboard Icon" style="width: 50%; display: block; margin-top: 0; margin-bottom: 1rem;">
+    <img src="img/everboard_icon.svg" alt="Everboard Icon" style="width: 160px; display: block; margin-top: 0; margin-bottom: 1rem;">
     <p style="margin: 0; padding: 0; text-align: justify;">
       <a href="https://web.archive.org/web/20211202151652/http://everboard.io">Everboard</a> was a versatile iOS keyboard app designed to streamline sharing and enhance messaging by embedding your favorite services directly into your keyboard, eliminating constant app switching.<br><br>
       Many of Everboard’s extensions were available for free, with additional paid add-ons available via an in-app store.<br><br>
