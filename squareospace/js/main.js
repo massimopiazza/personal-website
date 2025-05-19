@@ -140,7 +140,25 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', () => {
     if (detailView.classList.contains('open')) {
       adjustTitleFontSize();
+      // Initialize Everboard carousel inside the newly inserted detailContent
+      initEverboardCarousel(detailContent);
       shiftFooter();
+      // Workaround: trigger click on current Everboard icon to reset carousel on resize
+      const carousel = detailContent.querySelector('.header_carrousel');
+      if (carousel) {
+        const screenWrapper = carousel.querySelector('.screen_wrapper');
+        const screens = screenWrapper.children;
+        if (screens.length > 0) {
+          const screenWidth = screens[0].clientWidth;
+          const mlPx = screenWrapper.style.marginLeft || '0px';
+          const ml = parseInt(mlPx, 10) || 0;
+          const currentIndex = Math.round(-ml / screenWidth);
+          const icons = carousel.querySelectorAll('.icon_wrapper .icon');
+          if (icons[currentIndex]) {
+            icons[currentIndex].dispatchEvent(new Event('click'));
+          }
+        }
+      }
     }
   });
 
@@ -163,6 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
           spinner.classList.add('hidden');
           // Parse and display markdown
           detailContent.innerHTML = marked.parse(md);
+          // Initialize Everboard carousel after markdown insertion
+          initEverboardCarousel(detailContent);
           // Ensure links open in new tab
           detailContent.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
           adjustTitleFontSize();
@@ -225,5 +245,87 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.style.transform = '';
       });
     });
-  }
-});
+    }
+  
+  // Everboard carousel initialization
+    function initEverboardCarousel(root = document) {
+      const carousel = root.querySelector('.header_carrousel');
+      if (!carousel) return;
+      const screenWrapper = carousel.querySelector('.screen_wrapper');
+      const iconWrapper = carousel.querySelector('.icon_wrapper');
+
+      const screens = Array.from(screenWrapper.children);
+      const screenWidth = 229;
+      const pauseDuration = 4000;
+      const animationDuration = 1000;
+
+      // Compute icon dimensions and spacing for centering
+      const iconElems = iconWrapper.children;
+      const icons = Array.from(iconElems);
+      const iconWidth = iconElems[0].offsetWidth;
+      const iconSpacing = iconElems[1].offsetLeft - iconElems[0].offsetLeft;
+      const containerWidth = iconWrapper.parentElement.clientWidth;
+
+      // Clone for infinite scroll
+      screenWrapper.appendChild(screens[0].cloneNode(true));
+      const initialIcons = Array.from(iconElems);
+      initialIcons.forEach(icon => iconWrapper.appendChild(icon.cloneNode(true)));
+
+      // Center the first icon without animation
+      iconWrapper.style.transition = 'none';
+      iconWrapper.style.marginLeft = `${(containerWidth / 2) - (iconWidth / 2)}px`;
+
+      // Set wrapper widths
+      const totalScreens = screenWrapper.children.length;
+      const totalIcons = iconWrapper.children.length;
+      screenWrapper.style.width = `${totalScreens * screenWidth}px`;
+      // Allow flex container to size automatically for centering
+      iconWrapper.style.width = 'auto';
+
+      let currentIndex = 0;
+      let slideInterval;
+
+      function goTo(index) {
+        // Slide screen
+        screenWrapper.style.transition = `margin-left ${animationDuration}ms ease`;
+        screenWrapper.style.marginLeft = `-${index * screenWidth}px`;
+
+        // Center the corresponding icon
+        iconWrapper.style.transition = `margin-left ${animationDuration}ms ease`;
+        const offset = index * iconSpacing;
+        const newMarginLeft = (containerWidth / 2) - offset - (iconWidth / 2);
+        iconWrapper.style.marginLeft = `${newMarginLeft}px`;
+
+        currentIndex = index;
+      }
+
+      function nextSlide() {
+        const next = currentIndex + 1;
+        goTo(next);
+        if (next >= totalScreens - 1) {
+          setTimeout(() => {
+            screenWrapper.style.transition = 'none';
+            screenWrapper.style.marginLeft = '0';
+            iconWrapper.style.transition = 'none';
+            // Recenter first icon
+            iconWrapper.style.marginLeft = `${(containerWidth / 2) - (iconWidth / 2)}px`;
+            currentIndex = 0;
+          }, animationDuration);
+        }
+      }
+
+      icons.forEach((icon, idx) => {
+        icon.style.cursor = 'pointer';
+        icon.addEventListener('click', () => {
+          clearInterval(slideInterval);
+          goTo(idx);
+          slideInterval = setInterval(nextSlide, pauseDuration);
+        });
+      });
+
+      slideInterval = setInterval(nextSlide, pauseDuration);
+    }
+
+    // Initialize on page load (no-op if carousel not in DOM yet)
+    initEverboardCarousel();
+  });

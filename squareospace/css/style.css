@@ -604,6 +604,75 @@ color: var(--accent-hover-md-url);     /* slight darker shade on hover */
 /***********************************/
 /* End of MARKDOWN RENDERING STYLE */
 
+/* Everboard carousel styles */
+.header_carrousel {
+  width: 380px;
+  height: 630px;
+  margin-top: 1rem;
+  float: right;
+  overflow: hidden;
+}
+.header_carrousel .c_iphone {
+  width: 70%;
+  height: 550px;
+  margin: 0 auto;
+  background-image: url('../img/everboard-carousel/iphone_frame.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+.header_carrousel .iphone_screen {
+  width: 229px;
+  height: 406px;
+  margin-top: 65px;
+  margin-left: 17px;
+  overflow: hidden;
+}
+.header_carrousel .screen_wrapper {
+  display: flex;
+  transition: margin-left 1s ease;
+}
+.header_carrousel .screen_wrapper img {
+  width: 229px;
+  flex-shrink: 0;
+}
+.header_carrousel .c_icons {
+  margin-top: 10px;
+  height: 57px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  /* Fade icons at edges */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.header_carrousel .icon_wrapper {
+  display: flex;
+  transition: transform 1s ease, margin-left 1s ease;
+}
+.header_carrousel .icon {
+  width: 57px;
+  height: 57px;
+  border-radius: 13px;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-left: 23.6px;
+  cursor: pointer;
+}
+.header_carrousel .icon:first-child {
+  margin-left: 0;
+}
+.header_carrousel .icon img {
+  width: 110%;
+  height: auto;
+  margin-top: -2px;
+  margin-left: -3px;
+}
+
 /* Video mockup container styling */
 .video-mockup-container {
   /* Configurable mockup container width (% of page width) */
@@ -634,4 +703,38 @@ color: var(--accent-hover-md-url);     /* slight darker shade on hover */
   transform: translate(-50%, -50%);
   width: var(--video-width);
   height: auto;
+}
+
+.multicol-md {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--multicol-gap, 2rem);
+}
+
+.multicol-md-text {
+  flex: var(--multicol-text-flex, 1.5);
+  margin: var(--multicol-text-margin, 0);
+  padding: var(--multicol-text-padding, 0);
+}
+
+.multicol-md-figure {
+  flex: var(--multicol-figure-flex, 1);
+  margin: var(--multicol-figure-margin, 0);
+  padding: var(--multicol-figure-padding, 0);
+}
+
+@media (max-width: 767px) {
+  .multicol-md {
+    flex-direction: column;
+  }
+  .multicol-md-text {
+    width: 100%;
+  }
+  .multicol-md-figure {
+    width: 65%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: var(--multicol-figure-mobile-margin-top, -2rem);
+    margin-bottom: var(--multicol-figure-mobile-margin-bottom, 2rem);
+  }
 }
