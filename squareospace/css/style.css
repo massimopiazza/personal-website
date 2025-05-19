@@ -600,5 +600,38 @@ color: var(--accent-hover-md-url);     /* slight darker shade on hover */
   color: var(--accent);
 }
 
+
 /***********************************/
 /* End of MARKDOWN RENDERING STYLE */
+
+/* Video mockup container styling */
+.video-mockup-container {
+  /* Configurable mockup container width (% of page width) */
+  --mockup-width: 50%;
+  /* Configurable mockup aspect ratio (height/width) */
+  --mockup-aspect: 2; /* adjust to your mockup image ratio */
+  /* Configurable video width (% of mockup width) */
+  --video-width: 80%;
+  /* Configurable horizontal offset from center */
+  --video-offset-x: 0px;
+  /* Configurable vertical offset from center */
+  --video-offset-y: 0px;
+
+  position: relative;
+  width: var(--mockup-width);
+  max-width: 100%;
+  height: 0;
+  padding-top: calc(var(--mockup-aspect) * 95%);
+  margin: 1rem auto 1rem; /* space below to prevent overlap */
+  background: url("../img/canvas_mockup_iphone6.png") no-repeat center center;
+  background-size: contain;
+}
+
+.video-mockup-container video {
+  position: absolute;
+  top: calc(50% + var(--video-offset-y));
+  left: calc(50% + var(--video-offset-x));
+  transform: translate(-50%, -50%);
+  width: var(--video-width);
+  height: auto;
+}
