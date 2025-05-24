@@ -143,6 +143,32 @@ h2 {
   background: none;
   border: none;
   cursor: pointer;
+  position: relative;
+  z-index: 0;
+  padding: var(--hover-overlay-padding-vertical) var(--hover-overlay-padding-horizontal);
+}
+
+.toggle-bio::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--dark-hover);
+  border-radius: var(--hover-overlay-radius);
+  opacity: 0;
+  transition: opacity 0.3s ease, left 0.3s ease, width 0.3s ease;
+  z-index: -1;
+}
+
+.toggle-bio:hover::before {
+  opacity: 1;
+}
+
+.toggle-bio.open::before {
+  left: var(--hover-overlay-padding-horizontal);
+  width: 1.5rem;
 }
 .toggle-bio svg {
   width: 1.5rem;
@@ -183,6 +209,7 @@ h2 {
   grid-template-columns: calc(var(--accordion-width) - var(--accordion-offset)) auto;
   align-items: center;
   font-family: 'TitleDefense', sans-serif;
+  transition: transform 1.0s ease;
 }
 .accordion-header::before {
   content: '';
@@ -209,10 +236,9 @@ h2 {
   width: var(--button-size);
   height: var(--button-size);
   font-size: var(--button-size);
-  transition: transform 0.5s ease;
   transform-origin: center center;
   color: var(--accent);
-  transition: background-color 0.3s ease;
+  transition: transform 0.5s ease, background-color 0.3s ease;
 }
 .accordion-header.open span { transform: rotate(45deg); }
 .accordion-content {
@@ -221,7 +247,7 @@ h2 {
   transition: max-height 0.5s ease;
 }
 .accordion-content ul {
-  margin-top: 1.2rem;
+  margin-top: 0.5rem;
   list-style: disc outside;
   padding-left: var(--accordion-offset);
   margin-bottom: 0;
@@ -230,7 +256,7 @@ h2 {
   margin-bottom: 0;
 }
 .accordion-content ul li:last-child {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
 }
 .accordion-content a {
   color: var(--accent);
@@ -301,6 +327,12 @@ button {
   border-radius: 2rem;
   width: 25%;
   margin: 0 left;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#contact button:hover {
+  transform: translateY(0px);
+  filter: invert(25%);
 }
 
 /* Footer and social icons */
@@ -411,6 +443,7 @@ transition: filter 0.3s ease, transform 0s ease;
 .detail-body {
   padding: var(--extra-offset) var(--side-margin) var(--side-margin) var(--side-margin);
   overflow-y: auto;
+  overscroll-behavior: contain;
   flex: 1;
 }
 
@@ -794,4 +827,14 @@ color: var(--accent-hover-md-url);     /* slight darker shade on hover */
     margin-top: var(--multicol-figure-mobile-margin-top, -2rem);
     margin-bottom: var(--multicol-figure-mobile-margin-bottom, 2rem);
   }
+}
+
+/* Hover effect for accordion headers */
+.accordion-header:hover {
+  font-weight: bold;
+  transform: translateY(-2px);
+}
+
+.accordion-header:hover span {
+  font-weight: normal;
 }
