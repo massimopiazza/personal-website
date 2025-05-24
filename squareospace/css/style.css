@@ -14,8 +14,9 @@
 :root {
   --accent-rgb: 152, 0, 0;
   --accent: rgb(var(--accent-rgb));
-  --accent-hover: rgba(0,0,0, 0.10); /*rgba(var(--accent-rgb), 0.15)*/
   --accent-hover-md-url: rgb(201, 163, 161);
+  --accent-hover: rgba(var(--accent-rgb), 0.10);
+  --dark-hover: rgba(0,0,0, 0.10);
   --nav-height: 60px;
   --footer-height: 60px;
   --extra-offset: 10px;
@@ -31,6 +32,10 @@
   --dock-min-scale: 1;
   --dock-distance: 64px;
   --spinner-size: 96px;
+  /* Padding for hover overlay on accordion links */
+  --hover-overlay-padding-vertical: 10px;
+  --hover-overlay-padding-horizontal: 6px;
+  --hover-overlay-radius: 0.5rem;
 }
 
 /* Responsive adjustments */
@@ -165,7 +170,7 @@ h2 {
  transition: background-color 0.3s ease;
 }
 .hover-accent-overlay:hover {
- background-color: var(--accent-hover);
+ background-color: var(--dark-hover);
 }
 .toggle-bio.open .toggle-text { opacity: 0; }
 
@@ -217,18 +222,48 @@ h2 {
 }
 .accordion-content ul {
   margin-top: 1.2rem;
-  list-style: disc inside;
-  padding: 0 1rem;
+  list-style: disc outside;
+  padding-left: var(--accordion-offset);
   margin-bottom: 0;
 }
 .accordion-content ul li {
+  margin-bottom: 0;
+}
+.accordion-content ul li:last-child {
   margin-bottom: 0.75rem;
 }
 .accordion-content a {
   color: var(--accent);
   text-decoration: none;
 }
-.accordion-content a:hover { text-decoration: underline; }
+.accordion-content a:hover { text-decoration: none; }
+
+.accordion-content a {
+  position: relative;
+  z-index: 0;
+  display: block;
+  padding: var(--hover-overlay-padding-vertical) var(--hover-overlay-padding-horizontal);
+  /* Constrain width so hover overlay ends at separator line */
+  max-width: calc(var(--accordion-width) - var(--accordion-offset));
+}
+
+.accordion-content a::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--dark-hover);
+  border-radius: var(--hover-overlay-radius);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.accordion-content a:hover::before {
+  opacity: 1;
+}
 
 /* Consulting section */
 #consulting { margin-top: 4rem; }
@@ -417,7 +452,7 @@ transition: filter 0.3s ease, transform 0s ease;
 }
 
 #closeDetail:hover {
-  background-color: var(--accent-hover);
+  background-color: var(--dark-hover);
 }
 
 
@@ -435,6 +470,26 @@ transition: filter 0.3s ease, transform 0s ease;
   align-items: center;
   color: var(--accent);
   text-decoration: none;
+  position: relative;
+  z-index: 0;
+  padding: var(--hover-overlay-padding-vertical) var(--hover-overlay-padding-horizontal);
+}
+
+.download-resume::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--dark-hover);
+  border-radius: var(--hover-overlay-radius);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+.download-resume:hover::before {
+  opacity: 1;
 }
 
 
