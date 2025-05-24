@@ -164,6 +164,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // Project link click handler with loading spinner
+// Add dynamic href attributes so project links reflect project IDs in the URL hash
+document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
+  const mdPath = link.getAttribute('data-project');
+  const id = mdPath.split('/').pop().replace('.md','');
+  link.setAttribute('href', `#project=${id}`);
+});
   document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
     link.addEventListener('click', e => {
       e.preventDefault();
@@ -210,6 +216,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   closeBtn.addEventListener('click', closeDetail);
 
+  // Listen to hashchange and open project based on URL hash
+  function openProjectFromHash() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#project=')) {
+      const projectId = hash.substring('#project='.length);
+      const link = document.querySelector(`.accordion-content a[data-project$="${projectId}.md"]`);
+      if (link) {
+        link.click();
+      }
+    }
+  }
+  window.addEventListener('hashchange', openProjectFromHash);
+  // Open project if hash present on initial load
+  openProjectFromHash();
+  
   // Interactive swipe-to-close: drag detail panel by left edge and close if threshold exceeded
   (function setupInteractiveSwipeToClose() {
     let startX = 0, startY = 0, initialPageLeft = 0;
@@ -267,6 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // snap back to original position
         detailView.style.transform = '';
         pageContent.style.transform = '';
+        // Clear URL hash on closing detail view
+        window.location.hash = '';
       }
     });
   })();

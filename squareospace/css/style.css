@@ -841,3 +841,16 @@ color: var(--accent-hover-md-url);     /* slight darker shade on hover */
 .accordion-header:hover span {
   font-weight: normal;
 }
+
+
+/* Disable hover overlays on touch devices to prevent stuck overlays */
+@media (hover: none) and (pointer: coarse) {
+.toggle-bio::before,
+.toggle-bio:hover::before {
+display: none !important;
+}
+#contact button:hover {
+transform: none !important;
+filter: none !important;
+}
+}
