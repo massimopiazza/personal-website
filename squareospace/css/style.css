@@ -881,17 +881,15 @@ color: var(--accent-hover-md-url);     /* slight darker shade on hover */
     opacity: 0;
     transition: opacity 0.0s ease;
   }
-  .socials a:hover::after,
-  .socials a:hover::before {
-    opacity: 1;
-  }
+.socials a:hover::after,
+.socials a:hover::before {
+opacity: 1;
 }
 }
-
 
 /* Disable hover overlays on touch devices to prevent stuck overlays */
 @media (hover: none) and (pointer: coarse) {
-.toggle-bio::before,
+
 .toggle-bio:hover::before {
 display: none !important;
 }
