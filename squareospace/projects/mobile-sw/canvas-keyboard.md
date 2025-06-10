@@ -3,9 +3,9 @@
 <div class="multicol-md-text">
 <img src="img/canvas_icon.svg" alt="Canvas Icon" style="width: 160px; display: block; margin-top: 0rem; margin-bottom: 1rem;">
 <p style="margin: 0; padding: 0; text-align: justify;">
-<a href="https://web.archive.org/web/20220101122114/http://canvaskeyboard.com/">Canvas Keyboard</a> was an iOS app designed to eliminate repetitive typing by allowing users to quickly recall frequently-used texts and actions through intuitive gestures. Released in <strong>2015</strong>, Canvas introduced an integrated <strong>typing</strong> and <strong>gesture-recognition</strong> experience, streamlining tedious tasks.<br><br>
+<a href="https://web.archive.org/web/20220101122114/http://canvaskeyboard.com/">Canvas Keyboard</a> was an iOS app designed to eliminate repetitive typing by allowing users to quickly recall frequently used texts and actions through intuitive gestures. Released in <strong>2015</strong>, Canvas introduced an integrated <strong>typing</strong> and <strong>gesture-recognition</strong> experience, streamlining tedious tasks.<br><br>
 During my time as co-founder/CTO of WatchApp Inc., I developed the entire source code of the app and part of its UX/UI.<br><br>
-Canvas Keyboard was also featured by Apple on the App Store home page of 157 countries as one of the 20 world's best apps developed by under-20s.<br><br><br>
+Canvas Keyboard was also featured by Apple on the App Store homepage of 157 countries as one of the world's 20 best apps developed by under-20s.<br><br><br>
 </p></div>
 
 <div class="multicol-md-figure">
@@ -20,7 +20,7 @@ Canvas Keyboard was also featured by Apple on the App Store home page of 157 cou
 Users could replace or complement their device’s native keyboard with Canvas, easily assigning personalized gestures to common text snippets and actions. After a simple setup, users could rapidly execute shortcuts by drawing gestures directly on the keyboard.
 
 ### Text shortcuts
-Canvas significantly simplified repetitive typing tasks. Whether filling out online forms, entering credit card information, users could instantly recall these texts through quick gestures.
+Canvas significantly simplified repetitive typing tasks. Whether filling out online forms or entering credit card information, users could instantly recall these texts through quick gestures.
 
 ### Action shortcuts
 Beyond text snippets, Canvas supported action-based shortcuts. Gestures allowed users to swiftly share their location, pull up calendar events, set reminders, or activate text-to-speech functions.
@@ -30,7 +30,7 @@ Canvas seamlessly integrated typing and gesture drawing into a single, intellige
 
 ### Enhanced typing features
 The app also included smart enhancements and shortcuts compared to traditional mobile typing.
-- Smart Spacebar: scroll effortlessly through your text. This was leter brought into the iOS native keyboard by Apple.
+- Smart Spacebar: scroll effortlessly through your text. This was later brought into the iOS native keyboard by Apple.
 - Smart Shift: quickly capitalize your previously typed word.
 - Smart Backspace: instantly delete the last typed sentence.
 

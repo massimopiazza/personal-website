@@ -3,13 +3,13 @@
 <br><br>
 
 **What it solves:**  
-Conventional proximity-operations in orbit rely on ground control and bulky active sensors (LiDAR / radar). The patent proposes an alternatice on-board, monocular vision-only architecture that enables autonomous perception, guidance, and control of the "chaser" satellite. In particular the system:  
+Conventional proximity-operations in orbit rely on ground control and bulky active sensors (LiDAR / radar). The patent proposes an alternative onboard, monocular vision-only architecture that enables autonomous perception, guidance, and control of the "chaser" satellite. In particular, the system:  
 
 - acquires grayscale monocular images continuously
-- runs far-range image processing to detect/identifie other space objects, and estimates their relative orbits via Unscented Kalman Filter and linearised orbital dynamics
+- runs far-range image processing to detect/identify other space objects, and estimates their relative orbits via Unscented Kalman Filter and linearized orbital dynamics
 - once a target comes within a close proximity range, **near-range processing** estimates the target’s pose (position + attitude)
 - calculates rendezvous guidance onboard and estimates collision probability
-- issues real-time commands to the satellite’s attitude control & propulsion subsystems, to enable inspection, servicing, life-extension or debris removal operations
+- issues real-time commands to the satellite’s attitude control & propulsion subsystems, to enable inspection, servicing, life extension or debris removal operations
 <br>
 
 **Why it’s novel:**  

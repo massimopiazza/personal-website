@@ -55,7 +55,7 @@
 - **Express with humor:** Effortlessly browse and share trending GIFs, memes, and emoticons. Even create personalized memes instantly using the built-in meme generator.
 - **Integrated productivity tools:** Easily create, access, and share notes and contacts. View, add, and send calendar invites without ever leaving your conversation.
 - **Discover & share videos:** Explore and share trending YouTube videos directly from your keyboard.
-- **Local business recommendations:** Find, sort, and share restaurants, bars, and other local businesses seamlessly via Yelp integration.
+- **Local business recommendations:** Find, sort, and share restaurants, bars, and other local businesses via Yelp integration.
 - **Stay updated:** Quickly share news and insightful articles from The New York Times and your favorite RSS feeds directly into your chats.
 - **Smart image hashtagging:** Automatically generate relevant hashtags for your images using built-in AI-powered tagging.
 
