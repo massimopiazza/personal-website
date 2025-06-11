@@ -5,6 +5,15 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   const expandAllBtn = document.getElementById('expandAll');
+
+  function displayMarkdown(md) {
+    spinner.classList.add('hidden');
+    detailContent.innerHTML = marked.parse(md);
+    initEverboardCarousel(detailContent);
+    // Ensure links open in new tab
+    detailContent.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
+    adjustTitleFontSize();
+  }
   // Navigation indicator setup
   const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height'));
   const extraOffset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--extra-offset'));
@@ -176,27 +185,31 @@ document.querySelectorAll('.accordion-content a[data-project]').forEach(link => 
       const title = link.textContent;
       detailTitle.textContent = title;
       const mdPath = link.getAttribute('data-project');
+      const projectId = mdPath.split('/').pop().replace('.md', '');
       // Clear old content and show spinner
       detailContent.innerHTML = '';
       spinner.classList.remove('hidden');
       openDetail();
       adjustTitleFontSize();
       fetch(mdPath)
-        .then(response => response.ok ? response.text() : Promise.reject('Failed to load'))
+        .then(response => {
+          if (response.ok) {
+            return response.text();
+          } else {
+            throw new Error('Failed to load');
+          }
+        })
         .then(md => {
-          spinner.classList.add('hidden');
-          // Parse and display markdown
-          detailContent.innerHTML = marked.parse(md);
-          // Initialize Everboard carousel after markdown insertion
-          initEverboardCarousel(detailContent);
-          // Ensure links open in new tab
-          detailContent.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
-          adjustTitleFontSize();
+          displayMarkdown(md);
         })
         .catch(err => {
-          spinner.classList.add('hidden');
-          detailContent.innerHTML = '<p>Error loading project details. Please run the site via an HTTP server (e.g., python3 -m http.server).</p>';
-          console.error(err);
+          if (projectsContent && projectsContent[projectId]) {
+            displayMarkdown(projectsContent[projectId]);
+          } else {
+            spinner.classList.add('hidden');
+            detailContent.innerHTML = '<p>Error loading project details. Please run the site via an HTTP server (e.g., python3 -m http.server).</p>';
+            console.error(err);
+          }
         });
     });
   });

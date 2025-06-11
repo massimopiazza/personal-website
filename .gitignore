@@ -64,3 +64,6 @@ coverage/
 uploads/
 media/
 
+# Hardcoded cache in .js file (only needed for static export independent of HTTP server)
+projects-cache-static-export.js
+
