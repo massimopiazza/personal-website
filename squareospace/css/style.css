@@ -683,6 +683,8 @@ color: var(--accent-hover-md-url);     /* slight darker shade on hover */
   border-collapse: separate;
   border-spacing: 0.25rem 0.25rem;
   margin-bottom: 1rem;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
 }
 
 .detail-body th,
