@@ -1,4 +1,4 @@
-During my time at the Polytechnic University of Milan, I spent two years very actively involved with Skyward Experimental Rocketry.
+During my time at the Polytechnic University of Milan, I spent two years very actively involved with [Skyward Experimental Rocketry](https://skywarder.eu).
 
 In 2016, I joined the **Aerodynamics & Flight Dynamics** (AFD) department, initially focusing on flight dynamics and CFD simulations for the _Cyrano_ program.
 
