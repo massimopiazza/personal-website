@@ -2,7 +2,7 @@
 (Patent family headed by [FR3129737B1](https://patents.google.com/patent/FR3129737B1/en))
 <br><br>
 
-**What it solves:**  
+**What it solves**  
 Conventional proximity-operations in orbit rely on ground control and bulky active sensors (LiDAR / radar). The patent proposes an alternative onboard, monocular vision-only architecture that enables autonomous perception, guidance, and control of the "chaser" satellite. In particular, the system:  
 
 - acquires grayscale monocular images continuously
@@ -26,5 +26,5 @@ Conventional proximity-operations in orbit rely on ground control and bulky acti
 | **International (PCT)**<br>[WO 2023 / 094347 A1](https://patents.google.com/patent/WO2023094347A1/en) | Published 1 Jun 2023                | **PCT completed**                                |
 <br>
 
-#### Inventors & Assignee:  
-Emmanuel Koumandakis · Marco Nedungadi · Akshay Gulati · Massimo Piazza · Adrian Aguinaga — _Infinite Orbits, SAS_
+#### Inventors & Assignee  
+Emmanuel Koumandakis · Marco Nedungadi · Akshay Gulati · Massimo Piazza · Adrian Aguinaga  |  _Infinite Orbits, SAS_
