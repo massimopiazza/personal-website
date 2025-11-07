@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Sitemap: [https://squareospace.com/sitemap.xml](https://squareospace.com/sitemap.xml)
+
+```

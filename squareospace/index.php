@@ -1,4 +1,5 @@
 <?php
-// Serve the static index.html without changing the URL
-include __DIR__ . '/index.html';
+// 301 redirect to the canonical homepage
+header("Location: /index.html", true, 301);
 exit;
+?>

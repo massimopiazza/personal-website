@@ -173,11 +173,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // Project link click handler with loading spinner
-// Add dynamic href attributes so project links reflect project IDs in the URL hash
+// Ensure project links have real hrefs for SEO crawlers (and graceful no-JS navigation)
 document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
   const mdPath = link.getAttribute('data-project');
   const id = mdPath.split('/').pop().replace('.md','');
-  link.setAttribute('href', `#project=${id}`);
+  link.setAttribute('href', mdPath); // real path for crawlers & users without JS
+  link.dataset.projectId = id;
 });
   document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
     link.addEventListener('click', e => {
@@ -191,6 +192,8 @@ document.querySelectorAll('.accordion-content a[data-project]').forEach(link => 
       spinner.classList.remove('hidden');
       openDetail();
       adjustTitleFontSize();
+      // Reflect the opened project in the URL for shareability/deep-linking
+      window.location.hash = 'project=' + projectId;
       fetch(mdPath)
         .then(response => {
           if (response.ok) {
