@@ -305,6 +305,19 @@ h3 .accent { color: var(--accent); }
 #consulting { margin-top: 4rem; }
 #consulting p { font-style: italic; }
 
+#consultingSummaryHeading {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+#consultingSummaryHeading.consulting-summary-hidden {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+#consultingSummaryHeading.consulting-fast-fade {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
 /* Contact form */
 #contact { margin-top: 4rem; }
 #contact form {
