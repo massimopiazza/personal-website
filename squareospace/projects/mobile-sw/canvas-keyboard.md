@@ -1,7 +1,7 @@
 <div class="multicol-md">
 
 <div class="multicol-md-text">
-<img src="img/canvas_icon.svg" alt="Canvas Icon" style="width: 160px; display: block; margin-top: 0rem; margin-bottom: 1rem;">
+<img src="img/canvas_icon.svg" alt="Canvas Icon" data-no-zoom style="width: 160px; display: block; margin-top: 0rem; margin-bottom: 1rem;">
 <p style="margin: 0; padding: 0; text-align: justify;">
 <a href="https://web.archive.org/web/20220101122114/http://canvaskeyboard.com/">Canvas Keyboard</a> was an iOS app designed to eliminate repetitive typing by allowing users to quickly recall frequently used texts and actions through intuitive gestures. Released in <strong>2015</strong>, Canvas introduced an integrated <strong>typing</strong> and <strong>gesture-recognition</strong> experience, streamlining tedious tasks.<br><br>
 During my time as co-founder/CTO of WatchApp Inc., I developed the entire source code of the app and part of its UX/UI.<br><br>

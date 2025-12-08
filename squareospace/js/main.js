@@ -6,6 +6,85 @@
 document.addEventListener('DOMContentLoaded', () => {
   const expandAllBtn = document.getElementById('expandAll');
 
+  // Image Viewer State
+  let viewerImages = [];
+  let viewerIndex = 0;
+  const imageViewer = document.getElementById('imageViewer');
+  const viewerImage = document.getElementById('viewerImage');
+  const viewerCaption = document.getElementById('viewerCaption');
+  const viewerClose = document.getElementById('viewerClose');
+  const viewerPrev = document.getElementById('viewerPrev');
+  const viewerNext = document.getElementById('viewerNext');
+
+  function openImageViewer(index) {
+    viewerIndex = index;
+    updateViewerImage();
+    imageViewer.classList.remove('hidden');
+    // small delay to allow display:flex to apply before opacity transition
+    setTimeout(() => {
+      imageViewer.classList.add('visible');
+    }, 10);
+    document.addEventListener('keydown', handleViewerKeydown);
+  }
+
+  function closeImageViewer() {
+    imageViewer.classList.remove('visible');
+    setTimeout(() => {
+      imageViewer.classList.add('hidden');
+      viewerImage.src = ''; // Clear source
+      viewerCaption.textContent = ''; // Clear caption
+    }, 300); // 300ms matches CSS transition
+    document.removeEventListener('keydown', handleViewerKeydown);
+  }
+
+  function updateViewerImage() {
+    if (viewerImages.length === 0) return;
+    const imgData = viewerImages[viewerIndex];
+    viewerImage.src = imgData.src;
+    // Clean up caption: remove #no-zoom tag if present
+    viewerCaption.textContent = imgData.alt.replace('#no-zoom', '').trim();
+
+    // Update navigation buttons
+    if (viewerImages.length > 1) {
+      viewerPrev.classList.remove('hidden');
+      viewerNext.classList.remove('hidden');
+    } else {
+      viewerPrev.classList.add('hidden');
+      viewerNext.classList.add('hidden');
+    }
+  }
+
+  function nextImage() {
+    if (viewerImages.length <= 1) return;
+    viewerIndex = (viewerIndex + 1) % viewerImages.length;
+    updateViewerImage();
+  }
+
+  function prevImage() {
+    if (viewerImages.length <= 1) return;
+    viewerIndex = (viewerIndex - 1 + viewerImages.length) % viewerImages.length;
+    updateViewerImage();
+  }
+
+  function handleViewerKeydown(e) {
+    if (!imageViewer.classList.contains('visible')) return;
+    if (e.key === 'Escape') closeImageViewer();
+    if (e.key === 'ArrowRight') nextImage();
+    if (e.key === 'ArrowLeft') prevImage();
+  }
+
+  // Event Listeners for Viewer
+  if (viewerClose) viewerClose.addEventListener('click', closeImageViewer);
+  if (viewerNext) viewerNext.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
+  if (viewerPrev) viewerPrev.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
+
+  // Close on click outside image (optional but good UX)
+  if (imageViewer) imageViewer.addEventListener('click', (e) => {
+    if (e.target === imageViewer || e.target.classList.contains('viewer-image-container')) {
+      closeImageViewer();
+    }
+  });
+
   function displayMarkdown(md) {
     spinner.classList.add('hidden');
     detailContent.innerHTML = marked.parse(md);
@@ -13,6 +92,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ensure links open in new tab
     detailContent.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
     adjustTitleFontSize();
+
+    // Setup Image Viewer
+    const allImages = Array.from(detailContent.querySelectorAll('img'));
+
+    // Filter images:
+    // 1. Exclude carousel icons (inside .icon_wrapper)
+    // 2. Exclude images with data-no-zoom attribute
+    // 3. Exclude images with #no-zoom in alt text
+    const zoomableImages = allImages.filter(img => {
+      // Check parent
+      if (img.closest('.icon_wrapper')) return false;
+      // Check attribute
+      if (img.hasAttribute('data-no-zoom')) return false;
+      // Check alt text
+      const alt = img.getAttribute('alt') || '';
+      if (alt.includes('#no-zoom')) return false;
+
+      return true;
+    });
+
+    viewerImages = zoomableImages.map(img => ({
+      src: img.src,
+      alt: img.getAttribute('alt') || ''
+    }));
+    zoomableImages.forEach((img, index) => {
+      img.classList.add('zoomable');
+      img.addEventListener('click', () => {
+        openImageViewer(index);
+      });
+    });
   }
   // Navigation indicator setup
   const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height'));
@@ -172,20 +281,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeBtn = document.getElementById('closeDetail');
   const footerSocials = document.querySelector('footer .socials');
   const detailHeader = document.querySelector('.detail-header');
-    const spinner = document.getElementById('loadingSpinner');
-  
-    // Expand All button handler
-    expandAllBtn.addEventListener('click', () => {
-      document.querySelectorAll('.accordion-item').forEach(item => {
-        const header = item.querySelector('.accordion-header');
-        const content = item.querySelector('.accordion-content');
-        const isOpen = header.classList.contains('open');
-        if (!isOpen) {
-          content.style.maxHeight = content.scrollHeight + 'px';
-          header.style.setProperty('--line-move', content.scrollHeight + 'px');
-          header.classList.add('open');
-        }
-      });
+  const spinner = document.getElementById('loadingSpinner');
+
+  // Expand All button handler
+  expandAllBtn.addEventListener('click', () => {
+    document.querySelectorAll('.accordion-item').forEach(item => {
+      const header = item.querySelector('.accordion-header');
+      const content = item.querySelector('.accordion-content');
+      const isOpen = header.classList.contains('open');
+      if (!isOpen) {
+        content.style.maxHeight = content.scrollHeight + 'px';
+        header.style.setProperty('--line-move', content.scrollHeight + 'px');
+        header.classList.add('open');
+      }
+    });
     expandAllBtn.classList.add('hidden');
 
     // Delay scroll until after expand animation almost completes (CSS transition duration: 0.3 sec)
@@ -196,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         behavior: 'smooth'
       });
     }, 200);
-    });
+  });
 
   // Title font adjustment to fit in one line
   const detailTitle = document.getElementById('detailTitle');
@@ -211,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     detailTitle.style.fontSize = initialSize * scale + 'px';
   }
 
-// Adjust font size and re-center footer icons on detail view resize
+  // Adjust font size and re-center footer icons on detail view resize
   window.addEventListener('resize', () => {
     if (detailView.classList.contains('open')) {
       adjustTitleFontSize();
@@ -238,14 +347,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
-// Project link click handler with loading spinner
-// Ensure project links have real hrefs for SEO crawlers (and graceful no-JS navigation)
-document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
-  const mdPath = link.getAttribute('data-project');
-  const id = mdPath.split('/').pop().replace('.md','');
-  link.setAttribute('href', mdPath); // real path for crawlers & users without JS
-  link.dataset.projectId = id;
-});
+  // Project link click handler with loading spinner
+  // Ensure project links have real hrefs for SEO crawlers (and graceful no-JS navigation)
+  document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
+    const mdPath = link.getAttribute('data-project');
+    const id = mdPath.split('/').pop().replace('.md', '');
+    link.setAttribute('href', mdPath); // real path for crawlers & users without JS
+    link.dataset.projectId = id;
+  });
   document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
     link.addEventListener('click', e => {
       e.preventDefault();
@@ -312,7 +421,7 @@ document.querySelectorAll('.accordion-content a[data-project]').forEach(link => 
   window.addEventListener('hashchange', openProjectFromHash);
   // Open project if hash present on initial load
   openProjectFromHash();
-  
+
   // Interactive swipe-to-close: drag detail panel by left edge and close if threshold exceeded
   (function setupInteractiveSwipeToClose() {
     let startX = 0, startY = 0, initialPageLeft = 0;
@@ -487,86 +596,86 @@ document.querySelectorAll('.accordion-content a[data-project]').forEach(link => 
       });
     }
   }
-  
+
   // Everboard carousel initialization
-    function initEverboardCarousel(root = document) {
-      const carousel = root.querySelector('.header_carrousel');
-      if (!carousel) return;
-      const screenWrapper = carousel.querySelector('.screen_wrapper');
-      const iconWrapper = carousel.querySelector('.icon_wrapper');
+  function initEverboardCarousel(root = document) {
+    const carousel = root.querySelector('.header_carrousel');
+    if (!carousel) return;
+    const screenWrapper = carousel.querySelector('.screen_wrapper');
+    const iconWrapper = carousel.querySelector('.icon_wrapper');
 
-      const screens = Array.from(screenWrapper.children);
-      const screenWidth = 229;
-      const pauseDuration = 4000;
-      const animationDuration = 1000;
+    const screens = Array.from(screenWrapper.children);
+    const screenWidth = 229;
+    const pauseDuration = 4000;
+    const animationDuration = 1000;
 
-      // Compute icon dimensions and spacing for centering
-      const iconElems = iconWrapper.children;
-      const icons = Array.from(iconElems);
-      const iconWidth = iconElems[0].offsetWidth;
-      const iconSpacing = iconElems[1].offsetLeft - iconElems[0].offsetLeft;
-      const containerWidth = iconWrapper.parentElement.clientWidth;
+    // Compute icon dimensions and spacing for centering
+    const iconElems = iconWrapper.children;
+    const icons = Array.from(iconElems);
+    const iconWidth = iconElems[0].offsetWidth;
+    const iconSpacing = iconElems[1].offsetLeft - iconElems[0].offsetLeft;
+    const containerWidth = iconWrapper.parentElement.clientWidth;
 
-      // Clone for infinite scroll
-      screenWrapper.appendChild(screens[0].cloneNode(true));
-      const initialIcons = Array.from(iconElems);
-      initialIcons.forEach(icon => iconWrapper.appendChild(icon.cloneNode(true)));
+    // Clone for infinite scroll
+    screenWrapper.appendChild(screens[0].cloneNode(true));
+    const initialIcons = Array.from(iconElems);
+    initialIcons.forEach(icon => iconWrapper.appendChild(icon.cloneNode(true)));
 
-      // Center the first icon without animation
-      iconWrapper.style.transition = 'none';
-      iconWrapper.style.marginLeft = `${(containerWidth / 2) - (iconWidth / 2)}px`;
+    // Center the first icon without animation
+    iconWrapper.style.transition = 'none';
+    iconWrapper.style.marginLeft = `${(containerWidth / 2) - (iconWidth / 2)}px`;
 
-      // Set wrapper widths
-      const totalScreens = screenWrapper.children.length;
-      const totalIcons = iconWrapper.children.length;
-      screenWrapper.style.width = `${totalScreens * screenWidth}px`;
-      // Allow flex container to size automatically for centering
-      iconWrapper.style.width = 'auto';
+    // Set wrapper widths
+    const totalScreens = screenWrapper.children.length;
+    const totalIcons = iconWrapper.children.length;
+    screenWrapper.style.width = `${totalScreens * screenWidth}px`;
+    // Allow flex container to size automatically for centering
+    iconWrapper.style.width = 'auto';
 
-      let currentIndex = 0;
-      let slideInterval;
+    let currentIndex = 0;
+    let slideInterval;
 
-      function goTo(index) {
-        // Slide screen
-        screenWrapper.style.transition = `margin-left ${animationDuration}ms ease`;
-        screenWrapper.style.marginLeft = `-${index * screenWidth}px`;
+    function goTo(index) {
+      // Slide screen
+      screenWrapper.style.transition = `margin-left ${animationDuration}ms ease`;
+      screenWrapper.style.marginLeft = `-${index * screenWidth}px`;
 
-        // Center the corresponding icon
-        iconWrapper.style.transition = `margin-left ${animationDuration}ms ease`;
-        const offset = index * iconSpacing;
-        const newMarginLeft = (containerWidth / 2) - offset - (iconWidth / 2);
-        iconWrapper.style.marginLeft = `${newMarginLeft}px`;
+      // Center the corresponding icon
+      iconWrapper.style.transition = `margin-left ${animationDuration}ms ease`;
+      const offset = index * iconSpacing;
+      const newMarginLeft = (containerWidth / 2) - offset - (iconWidth / 2);
+      iconWrapper.style.marginLeft = `${newMarginLeft}px`;
 
-        currentIndex = index;
-      }
-
-      function nextSlide() {
-        const next = currentIndex + 1;
-        goTo(next);
-        if (next >= totalScreens - 1) {
-          setTimeout(() => {
-            screenWrapper.style.transition = 'none';
-            screenWrapper.style.marginLeft = '0';
-            iconWrapper.style.transition = 'none';
-            // Recenter first icon
-            iconWrapper.style.marginLeft = `${(containerWidth / 2) - (iconWidth / 2)}px`;
-            currentIndex = 0;
-          }, animationDuration);
-        }
-      }
-
-      icons.forEach((icon, idx) => {
-        icon.style.cursor = 'pointer';
-        icon.addEventListener('click', () => {
-          clearInterval(slideInterval);
-          goTo(idx);
-          slideInterval = setInterval(nextSlide, pauseDuration);
-        });
-      });
-
-      slideInterval = setInterval(nextSlide, pauseDuration);
+      currentIndex = index;
     }
 
-    // Initialize on page load (no-op if carousel not in DOM yet)
-    initEverboardCarousel();
-  });
+    function nextSlide() {
+      const next = currentIndex + 1;
+      goTo(next);
+      if (next >= totalScreens - 1) {
+        setTimeout(() => {
+          screenWrapper.style.transition = 'none';
+          screenWrapper.style.marginLeft = '0';
+          iconWrapper.style.transition = 'none';
+          // Recenter first icon
+          iconWrapper.style.marginLeft = `${(containerWidth / 2) - (iconWidth / 2)}px`;
+          currentIndex = 0;
+        }, animationDuration);
+      }
+    }
+
+    icons.forEach((icon, idx) => {
+      icon.style.cursor = 'pointer';
+      icon.addEventListener('click', () => {
+        clearInterval(slideInterval);
+        goTo(idx);
+        slideInterval = setInterval(nextSlide, pauseDuration);
+      });
+    });
+
+    slideInterval = setInterval(nextSlide, pauseDuration);
+  }
+
+  // Initialize on page load (no-op if carousel not in DOM yet)
+  initEverboardCarousel();
+});
