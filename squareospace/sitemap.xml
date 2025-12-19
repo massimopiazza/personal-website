@@ -8,19 +8,82 @@
   </url>
 
   <!-- Vision-based navigation -->
-
-<url><loc>[https://squareospace.com/projects/vision-based-navigation/cnn-based-spacecraft-pose-estimation.md](https://squareospace.com/projects/vision-based-navigation/cnn-based-spacecraft-pose-estimation.md)</loc><lastmod>2025-11-07</lastmod></url> <url><loc>[https://squareospace.com/projects/vision-based-navigation/io-camera.md](https://squareospace.com/projects/vision-based-navigation/io-camera.md)</loc><lastmod>2025-11-07</lastmod></url> <url><loc>[https://squareospace.com/projects/vision-based-navigation/robotic-testbed.md](https://squareospace.com/projects/vision-based-navigation/robotic-testbed.md)</loc><lastmod>2025-11-07</lastmod></url> <url><loc>[https://squareospace.com/projects/vision-based-navigation/patent.md](https://squareospace.com/projects/vision-based-navigation/patent.md)</loc><lastmod>2025-11-07</lastmod></url>
+  <url>
+    <loc>https://squareospace.com/projects/vision-based-navigation/cnn-based-spacecraft-pose-estimation.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://squareospace.com/projects/vision-based-navigation/io-camera.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://squareospace.com/projects/vision-based-navigation/robotic-testbed.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://squareospace.com/projects/vision-based-navigation/patent.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
   <!-- Systems engineering -->
-
-<url><loc>[https://squareospace.com/projects/systems-engineering/satellite-telecommunications.md](https://squareospace.com/projects/systems-engineering/satellite-telecommunications.md)</loc><lastmod>2025-11-07</lastmod></url> <url><loc>[https://squareospace.com/projects/systems-engineering/io-smallsats-and-servicing.md](https://squareospace.com/projects/systems-engineering/io-smallsats-and-servicing.md)</loc><lastmod>2025-11-07</lastmod></url>
+  <url>
+    <loc>https://squareospace.com/projects/systems-engineering/satellite-telecommunications.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://squareospace.com/projects/systems-engineering/io-smallsats-and-servicing.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 
   <!-- Academia -->
-
-<url><loc>[https://squareospace.com/projects/academia/publications.md](https://squareospace.com/projects/academia/publications.md)</loc><lastmod>2025-11-07</lastmod></url> <url><loc>[https://squareospace.com/projects/academia/skyward.md](https://squareospace.com/projects/academia/skyward.md)</loc><lastmod>2025-11-07</lastmod></url> <url><loc>[https://squareospace.com/projects/academia/various-projects.md](https://squareospace.com/projects/academia/various-projects.md)</loc><lastmod>2025-11-07</lastmod></url>
+  <url>
+    <loc>https://squareospace.com/projects/academia/publications.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://squareospace.com/projects/academia/skyward.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://squareospace.com/projects/academia/various-projects.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 
   <!-- Mobile software -->
-
-<url><loc>[https://squareospace.com/projects/mobile-sw/watchapp-inc.md](https://squareospace.com/projects/mobile-sw/watchapp-inc.md)</loc><lastmod>2025-11-07</lastmod></url> <url><loc>[https://squareospace.com/projects/mobile-sw/canvas-keyboard.md](https://squareospace.com/projects/mobile-sw/canvas-keyboard.md)</loc><lastmod>2025-11-07</lastmod></url> <url><loc>[https://squareospace.com/projects/mobile-sw/everboard.md](https://squareospace.com/projects/mobile-sw/everboard.md)</loc><lastmod>2025-11-07</lastmod></url> </urlset>
-
-```
+  <url>
+    <loc>https://squareospace.com/projects/mobile-sw/watchapp-inc.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://squareospace.com/projects/mobile-sw/canvas-keyboard.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://squareospace.com/projects/mobile-sw/everboard.md</loc>
+    <lastmod>2025-11-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>
