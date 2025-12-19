@@ -15,6 +15,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const viewerClose = document.getElementById('viewerClose');
   const viewerPrev = document.getElementById('viewerPrev');
   const viewerNext = document.getElementById('viewerNext');
+  const viewerContainer = imageViewer ? imageViewer.querySelector('.viewer-image-container') : null;
+
+  // Mobile swipe-to-navigate (image viewer)
+  // Guard edges to avoid iOS Safari back/forward gesture conflicts
+  const MOBILE_VIEWER_EDGE_GUARD_PX = 32;          // ignore gestures starting within this distance from screen edges
+  const MOBILE_VIEWER_SWIPE_THRESHOLD_PX = 60;     // minimum horizontal travel to trigger navigation
+  const MOBILE_VIEWER_INTENT_THRESHOLD_PX = 10;    // initial movement before locking intent (horizontal vs vertical)
+  const MOBILE_VIEWER_OFF_AXIS_RATIO = 0.75;       // require |dy| <= |dx| * ratio for a "horizontal" swipe
+  let viewerDidSwipe = false;                      // suppress "tap-to-close" after a swipe
+
+  const viewerSwipeState = {
+    tracking: false,
+    lockedHorizontal: false,
+    startX: 0,
+    startY: 0,
+    lastDX: 0,
+    lastDY: 0
+  };
 
   function openImageViewer(index) {
     viewerIndex = index;
@@ -33,6 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
       imageViewer.classList.add('hidden');
       viewerImage.src = ''; // Clear source
       viewerCaption.textContent = ''; // Clear caption
+      // Reset any swipe transforms
+      viewerImage.style.transition = '';
+      viewerImage.style.transform = '';
     }, 300); // 300ms matches CSS transition
     document.removeEventListener('keydown', handleViewerKeydown);
   }
@@ -40,6 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateViewerImage() {
     if (viewerImages.length === 0) return;
     const imgData = viewerImages[viewerIndex];
+
+    // Reset any swipe transforms before swapping content
+    viewerImage.style.transition = '';
+    viewerImage.style.transform = '';
+
     viewerImage.src = imgData.src;
     // Clean up caption: remove #no-zoom tag if present
     viewerCaption.textContent = imgData.alt.replace('#no-zoom', '').trim();
@@ -78,8 +104,126 @@ document.addEventListener('DOMContentLoaded', () => {
   if (viewerNext) viewerNext.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
   if (viewerPrev) viewerPrev.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
 
+  // Mobile-only: swipe left/right to navigate images (only when multiple images exist)
+  function isMobileViewer() {
+    return window.matchMedia('(max-width: 767px) and (hover: none) and (pointer: coarse)').matches;
+  }
+
+  function resetViewerSwipeState() {
+    viewerSwipeState.tracking = false;
+    viewerSwipeState.lockedHorizontal = false;
+    viewerSwipeState.startX = 0;
+    viewerSwipeState.startY = 0;
+    viewerSwipeState.lastDX = 0;
+    viewerSwipeState.lastDY = 0;
+    viewerImage.style.transition = '';
+    viewerImage.style.transform = '';
+  }
+
+  function setupMobileViewerSwipe() {
+    if (!viewerContainer) return;
+
+    viewerContainer.addEventListener('touchstart', (e) => {
+      if (!isMobileViewer()) return;
+      if (!imageViewer.classList.contains('visible')) return;
+      if (viewerImages.length <= 1) return;
+      if (!e.touches || e.touches.length !== 1) return;
+
+      const t = e.touches[0];
+
+      // Edge guard to avoid iOS Safari back/forward navigation gestures
+      const w = window.innerWidth || document.documentElement.clientWidth;
+      if (t.clientX <= MOBILE_VIEWER_EDGE_GUARD_PX || t.clientX >= (w - MOBILE_VIEWER_EDGE_GUARD_PX)) {
+        return;
+      }
+
+      viewerDidSwipe = false;
+      viewerSwipeState.tracking = true;
+      viewerSwipeState.lockedHorizontal = false;
+      viewerSwipeState.startX = t.clientX;
+      viewerSwipeState.startY = t.clientY;
+      viewerSwipeState.lastDX = 0;
+      viewerSwipeState.lastDY = 0;
+    }, { passive: true });
+
+    viewerContainer.addEventListener('touchmove', (e) => {
+      if (!viewerSwipeState.tracking) return;
+      if (!e.touches || e.touches.length !== 1) return;
+
+      const t = e.touches[0];
+      const dx = t.clientX - viewerSwipeState.startX;
+      const dy = t.clientY - viewerSwipeState.startY;
+      viewerSwipeState.lastDX = dx;
+      viewerSwipeState.lastDY = dy;
+
+      // Wait for a bit of movement before locking intent
+      if (!viewerSwipeState.lockedHorizontal) {
+        if (Math.abs(dx) < MOBILE_VIEWER_INTENT_THRESHOLD_PX && Math.abs(dy) < MOBILE_VIEWER_INTENT_THRESHOLD_PX) {
+          return;
+        }
+        // If the gesture looks more vertical than horizontal, abandon swipe tracking
+        if (Math.abs(dy) > Math.abs(dx)) {
+          viewerSwipeState.tracking = false;
+          return;
+        }
+        viewerSwipeState.lockedHorizontal = true;
+      }
+
+      // From here: treat as horizontal swipe; prevent scrolling/overscroll
+      e.preventDefault();
+
+      // Give subtle visual feedback (translate while keeping scale=1 when visible)
+      viewerImage.style.transition = 'none';
+      viewerImage.style.transform = `translateX(${dx}px) scale(1)`;
+    }, { passive: false });
+
+    function finalizeSwipe() {
+      if (!viewerSwipeState.tracking) return;
+
+      const dx = viewerSwipeState.lastDX;
+      const dy = viewerSwipeState.lastDY;
+
+      // Snap back
+      viewerImage.style.transition = 'transform 150ms ease';
+      viewerImage.style.transform = 'translateX(0px) scale(1)';
+      setTimeout(() => {
+        // let CSS own the transform again
+        viewerImage.style.transition = '';
+        viewerImage.style.transform = '';
+      }, 160);
+
+      // Trigger nav only if clearly horizontal and exceeds threshold
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+      const horizontalEnough = absDy <= absDx * MOBILE_VIEWER_OFF_AXIS_RATIO;
+
+      if (absDx >= MOBILE_VIEWER_SWIPE_THRESHOLD_PX && horizontalEnough && viewerImages.length > 1) {
+        viewerDidSwipe = true; // suppress "tap-to-close" right after swipe
+        if (dx < 0) {
+          nextImage(); // swipe left => next
+        } else {
+          prevImage(); // swipe right => prev
+        }
+        // Clear the flag shortly after to allow normal taps again
+        setTimeout(() => { viewerDidSwipe = false; }, 250);
+      }
+
+      resetViewerSwipeState();
+    }
+
+    viewerContainer.addEventListener('touchend', finalizeSwipe, { passive: true });
+    viewerContainer.addEventListener('touchcancel', () => {
+      resetViewerSwipeState();
+    }, { passive: true });
+  }
+
+  setupMobileViewerSwipe();
+
   // Close on click outside image (optional but good UX)
   if (imageViewer) imageViewer.addEventListener('click', (e) => {
+    // If the user just swiped, ignore the trailing click/tap
+    if (viewerDidSwipe) return;
+
     if (e.target === imageViewer || e.target.classList.contains('viewer-image-container')) {
       closeImageViewer();
     }
