@@ -1063,27 +1063,53 @@ footer {
   background-color: rgba(0, 0, 0, 0.9);
 }
 
+/* Viewer Track (replaces simple image container) */
 .viewer-image-container {
+  position: relative;
   display: flex;
   flex-direction: column;
-  /* Stack image and caption */
   justify-content: center;
   align-items: center;
   width: 100%;
   height: 100%;
-  padding: 2rem;
-  /* Space for buttons */
+  padding: 0;
+  /* Prevent browser navigation gestures on mobile */
+  overscroll-behavior-x: none;
+  z-index: 1010;
+  /* Above counter, below navigation/close */
+}
+
+.viewer-track {
+  position: relative;
+  width: 100%;
+  height: 85%;
+  /* Leave room for caption */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: pan-y;
+  /* Allow vertical scroll/interactions but capture horizontal */
+}
+
+.track-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
 }
 
 .viewer-image {
   width: auto;
   height: auto;
   max-width: 90%;
-  max-height: 85%;
-  /* Reduced slightly to make room for caption */
+  max-height: 100%;
   object-fit: contain;
   border-radius: var(--image-radius);
-  /* Configurable rounded corners */
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   transform: scale(0.9);
   transition: transform 0.3s ease;
@@ -1097,10 +1123,32 @@ footer {
   max-width: 80%;
   font-size: 1rem;
   opacity: 0.9;
+  z-index: 1020;
+  /* Ensure it is above masks/backgrounds */
+  position: relative;
+  /* Establish stacking context */
 }
 
 .image-viewer.visible .viewer-image {
   transform: scale(1);
+}
+
+/* Image Counter */
+.viewer-counter {
+  position: absolute;
+  /* Vertically align center with viewer-close (top: 2rem + 1.5rem center = 3.5rem) */
+  top: 1.5rem;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Centered on the point */
+  color: #fff;
+  font-family: 'TitleDefense', sans-serif;
+  font-size: 1.2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  z-index: 1005;
+  /* Above background, but below image container */
+  pointer-events: none;
+  opacity: 0.9;
 }
 
 /* Close button - similar to detail close but white/contrasting */
@@ -1119,7 +1167,8 @@ footer {
   color: #fff;
   font-size: 1.5rem;
   cursor: pointer;
-  z-index: 1010;
+  z-index: 1020;
+  /* High z-index to stay on top */
   transition: background 0.3s ease;
 }
 
@@ -1145,7 +1194,8 @@ footer {
   justify-content: center;
   /* Center horizontally */
   cursor: pointer;
-  z-index: 1010;
+  z-index: 1020;
+  /* High z-index to stay on top of image container */
   transition: background 0.3s ease;
   padding: 0.5rem;
 }
@@ -1231,7 +1281,7 @@ footer {
     height: auto;
     /* Let aspect ratio determine height */
     max-width: 100%;
-    max-height: 80%;
+    max-height: 100%;
     /* Leave space for caption */
     border-radius: 0;
     /* No rounded corners */

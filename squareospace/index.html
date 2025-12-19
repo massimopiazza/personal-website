@@ -336,6 +336,7 @@
 
 	<!-- Image Viewer Modal -->
 	<div id="imageViewer" class="image-viewer hidden">
+		<div id="viewerCounter" class="viewer-counter"></div>
 		<button id="viewerClose" class="viewer-close">X</button>
 		<button id="viewerPrev" class="viewer-nav viewer-prev hidden">
 			<svg viewBox="0 0 24 24" aria-hidden="true">
@@ -343,7 +344,7 @@
 			</svg>
 		</button>
 		<div class="viewer-image-container">
-			<img id="viewerImage" class="viewer-image" src="" alt="Full screen view">
+			<div id="viewerTrack" class="viewer-track"></div>
 			<div id="viewerCaption" class="viewer-caption"></div>
 		</div>
 		<button id="viewerNext" class="viewer-nav viewer-next hidden">

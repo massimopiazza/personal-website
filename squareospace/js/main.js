@@ -10,33 +10,52 @@ document.addEventListener('DOMContentLoaded', () => {
   let viewerImages = [];
   let viewerIndex = 0;
   const imageViewer = document.getElementById('imageViewer');
-  const viewerImage = document.getElementById('viewerImage');
+  const viewerTrack = document.getElementById('viewerTrack');
+  const viewerCounter = document.getElementById('viewerCounter');
   const viewerCaption = document.getElementById('viewerCaption');
   const viewerClose = document.getElementById('viewerClose');
   const viewerPrev = document.getElementById('viewerPrev');
   const viewerNext = document.getElementById('viewerNext');
   const viewerContainer = imageViewer ? imageViewer.querySelector('.viewer-image-container') : null;
 
-  // Mobile swipe-to-navigate (image viewer)
-  // Guard edges to avoid iOS Safari back/forward gesture conflicts
-  const MOBILE_VIEWER_EDGE_GUARD_PX = 32;          // ignore gestures starting within this distance from screen edges
-  const MOBILE_VIEWER_SWIPE_THRESHOLD_PX = 60;     // minimum horizontal travel to trigger navigation
-  const MOBILE_VIEWER_INTENT_THRESHOLD_PX = 10;    // initial movement before locking intent (horizontal vs vertical)
-  const MOBILE_VIEWER_OFF_AXIS_RATIO = 0.75;       // require |dy| <= |dx| * ratio for a "horizontal" swipe
-  let viewerDidSwipe = false;                      // suppress "tap-to-close" after a swipe
+  // Track state
+  const TRACK_GAP_PX = 40; // Gap between images
+  let trackItems = []; // Array of div.track-item elements
 
-  const viewerSwipeState = {
-    tracking: false,
-    lockedHorizontal: false,
-    startX: 0,
-    startY: 0,
-    lastDX: 0,
-    lastDY: 0
-  };
+  // Touch State
+  const SWIPE_THRESHOLD = 0.2; // 20% of screen width to trigger
+  let isDragging = false;
+  let startX = 0;
+  let currentX = 0;
+  let isAnimating = false;
+
+  function createTrackItem() {
+    const div = document.createElement('div');
+    div.classList.add('track-item');
+    const img = document.createElement('img');
+    img.classList.add('viewer-image');
+    img.draggable = false; // Disable native drag
+    div.appendChild(img);
+    return { div, img };
+  }
+
+  function initTrack() {
+    if (!viewerTrack) return;
+    viewerTrack.innerHTML = '';
+    trackItems = [];
+    // Create 3 items: prev, curr, next
+    for (let i = 0; i < 3; i++) {
+      const item = createTrackItem();
+      viewerTrack.appendChild(item.div);
+      trackItems.push(item);
+    }
+  }
+
+  initTrack();
 
   function openImageViewer(index) {
     viewerIndex = index;
-    updateViewerImage();
+    updateViewerContent(false); // Immediate update without animation
     imageViewer.classList.remove('hidden');
     // small delay to allow display:flex to apply before opacity transition
     setTimeout(() => {
@@ -49,47 +68,153 @@ document.addEventListener('DOMContentLoaded', () => {
     imageViewer.classList.remove('visible');
     setTimeout(() => {
       imageViewer.classList.add('hidden');
-      viewerImage.src = ''; // Clear source
-      viewerCaption.textContent = ''; // Clear caption
-      // Reset any swipe transforms
-      viewerImage.style.transition = '';
-      viewerImage.style.transform = '';
-    }, 300); // 300ms matches CSS transition
+      // Clear sources to stop memory usage
+      trackItems.forEach(item => item.img.src = '');
+      viewerCaption.textContent = '';
+      viewerCounter.textContent = '';
+    }, 300);
     document.removeEventListener('keydown', handleViewerKeydown);
   }
 
-  function updateViewerImage() {
+  function getImgData(idx) {
+    if (idx < 0 || idx >= viewerImages.length) return null;
+    return viewerImages[idx];
+  }
+
+  function updateViewerContent(animate = false) {
     if (viewerImages.length === 0) return;
-    const imgData = viewerImages[viewerIndex];
 
-    // Reset any swipe transforms before swapping content
-    viewerImage.style.transition = '';
-    viewerImage.style.transform = '';
+    // Determine indices
+    const prevIdx = viewerIndex - 1;
+    const currIdx = viewerIndex;
+    const nextIdx = viewerIndex + 1;
 
-    viewerImage.src = imgData.src;
-    // Clean up caption: remove #no-zoom tag if present
-    viewerCaption.textContent = imgData.alt.replace('#no-zoom', '').trim();
+    // Update Image Sources & Visibility
+    const prevItem = trackItems[0];
+    const currItem = trackItems[1];
+    const nextItem = trackItems[2];
 
-    // Update navigation buttons
+    const prevData = getImgData(prevIdx);
+    const currData = getImgData(currIdx);
+    const nextData = getImgData(nextIdx);
+
+    // Helper to set item
+    const setItem = (item, data) => {
+      if (data) {
+        if (item.img.getAttribute('src') !== data.src) {
+          item.img.src = data.src;
+          item.img.alt = data.alt;
+        }
+        item.div.style.display = 'flex';
+      } else {
+        item.div.style.display = 'none';
+      }
+    };
+
+    if (!animate) {
+      setItem(prevItem, prevData);
+      setItem(currItem, currData);
+      setItem(nextItem, nextData);
+
+      // Position items
+      resetTrackPositions();
+    }
+
+    // Update Caption (Current Image)
+    if (currData) {
+      viewerCaption.textContent = currData.alt.replace('#no-zoom', '').trim();
+    }
+
+    // Update Counter
     if (viewerImages.length > 1) {
-      viewerPrev.classList.remove('hidden');
-      viewerNext.classList.remove('hidden');
+      viewerCounter.textContent = `${viewerIndex + 1} of ${viewerImages.length}`;
+      viewerCounter.style.display = 'block';
     } else {
+      viewerCounter.style.display = 'none';
+    }
+
+    // Update Buttons (Logic: Hide if at ends)
+    if (viewerIndex === 0) {
       viewerPrev.classList.add('hidden');
+    } else {
+      viewerPrev.classList.remove('hidden');
+    }
+
+    if (viewerIndex === viewerImages.length - 1) {
       viewerNext.classList.add('hidden');
+    } else {
+      viewerNext.classList.remove('hidden');
     }
   }
 
+  function resetTrackPositions() {
+    // Force a read of width to ensure we have current dimensions
+    const width = viewerTrack.clientWidth || window.innerWidth;
+    const gap = TRACK_GAP_PX;
+
+    if (!trackItems[0] || !trackItems[1] || !trackItems[2]) return;
+
+    // trackItems[0] = prev
+    trackItems[0].div.style.transform = `translateX(${-width - gap}px)`;
+    // trackItems[1] = curr
+    trackItems[1].div.style.transform = `translateX(0px)`;
+    // trackItems[2] = next
+    trackItems[2].div.style.transform = `translateX(${width + gap}px)`;
+
+    trackItems.forEach(t => t.div.style.transition = 'none');
+  }
+
+  // Handle window resize to prevent overlapping images
+  window.addEventListener('resize', () => {
+    if (imageViewer.classList.contains('visible') || imageViewer.classList.contains('hidden')) {
+      // Only reset if viewer exists/initialized
+      // Use RequestAnimationFrame to debounce slightly/ensure layout is ready
+      requestAnimationFrame(() => {
+        resetTrackPositions();
+      });
+    }
+  });
+
   function nextImage() {
-    if (viewerImages.length <= 1) return;
-    viewerIndex = (viewerIndex + 1) % viewerImages.length;
-    updateViewerImage();
+    if (isAnimating) return;
+    if (viewerIndex >= viewerImages.length - 1) return;
+    animateSlide('next');
   }
 
   function prevImage() {
-    if (viewerImages.length <= 1) return;
-    viewerIndex = (viewerIndex - 1 + viewerImages.length) % viewerImages.length;
-    updateViewerImage();
+    if (isAnimating) return;
+    if (viewerIndex <= 0) return;
+    animateSlide('prev');
+  }
+
+  function animateSlide(dir) {
+    isAnimating = true;
+    const width = viewerTrack.clientWidth || window.innerWidth;
+    const gap = TRACK_GAP_PX;
+
+    // Enable transition
+    trackItems.forEach(t => t.div.style.transition = 'transform 0.3s ease-out');
+
+    if (dir === 'next') {
+      // Current moves left
+      trackItems[1].div.style.transform = `translateX(${-width - gap}px)`;
+      // Next moves into center
+      trackItems[2].div.style.transform = `translateX(0px)`;
+      // Prev moves further left (optional, or just stays)
+    } else {
+      // Current moves right
+      trackItems[1].div.style.transform = `translateX(${width + gap}px)`;
+      // Prev moves into center
+      trackItems[0].div.style.transform = `translateX(0px)`;
+    }
+
+    setTimeout(() => {
+      if (dir === 'next') viewerIndex++;
+      else viewerIndex--;
+
+      updateViewerContent(false);
+      isAnimating = false;
+    }, 300);
   }
 
   function handleViewerKeydown(e) {
@@ -99,132 +224,136 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'ArrowLeft') prevImage();
   }
 
-  // Event Listeners for Viewer
+  // Event Listeners for Viewer Buttons
   if (viewerClose) viewerClose.addEventListener('click', closeImageViewer);
   if (viewerNext) viewerNext.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
   if (viewerPrev) viewerPrev.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
 
-  // Mobile-only: swipe left/right to navigate images (only when multiple images exist)
-  function isMobileViewer() {
-    return window.matchMedia('(max-width: 767px) and (hover: none) and (pointer: coarse)').matches;
-  }
+  // Mobile Swipe Logic (Continuous Physics)
+  // Only enable if multiple images
+  const edgeThreshold = 30; // disable swipe if start near edge
 
-  function resetViewerSwipeState() {
-    viewerSwipeState.tracking = false;
-    viewerSwipeState.lockedHorizontal = false;
-    viewerSwipeState.startX = 0;
-    viewerSwipeState.startY = 0;
-    viewerSwipeState.lastDX = 0;
-    viewerSwipeState.lastDY = 0;
-    viewerImage.style.transition = '';
-    viewerImage.style.transform = '';
-  }
-
-  function setupMobileViewerSwipe() {
-    if (!viewerContainer) return;
-
-    viewerContainer.addEventListener('touchstart', (e) => {
-      if (!isMobileViewer()) return;
-      if (!imageViewer.classList.contains('visible')) return;
+  if (viewerTrack) {
+    viewerTrack.addEventListener('touchstart', (e) => {
       if (viewerImages.length <= 1) return;
-      if (!e.touches || e.touches.length !== 1) return;
+      if (isAnimating) return;
 
-      const t = e.touches[0];
+      const touch = e.touches[0];
 
-      // Edge guard to avoid iOS Safari back/forward navigation gestures
-      const w = window.innerWidth || document.documentElement.clientWidth;
-      if (t.clientX <= MOBILE_VIEWER_EDGE_GUARD_PX || t.clientX >= (w - MOBILE_VIEWER_EDGE_GUARD_PX)) {
-        return;
+      // Edge guard for browser back gesture (Swipe right from left edge)
+      if (touch.clientX < edgeThreshold) {
+        // Let the browser handle it... OR prevent it? 
+        // User asked: "On mobile only ... disabled ... As you close it, enabled."
+        // We preventDefault here to try to block browser back, but iOS is aggressive.
+        // But we can only preventDefault if usage is passive: false.
+        // Let's assume passive: false for touchmove. 
+        // BUT: if we preventDefault on touchstart, we stop all scrolling/clicks.
+        // Since this is the viewer, stopping all scrolling is GOOD.
+        // We want the viewer to be the only thing consuming touches.
+      } else if (touch.clientX > window.innerWidth - edgeThreshold) {
+        // Right edge
       }
 
-      viewerDidSwipe = false;
-      viewerSwipeState.tracking = true;
-      viewerSwipeState.lockedHorizontal = false;
-      viewerSwipeState.startX = t.clientX;
-      viewerSwipeState.startY = t.clientY;
-      viewerSwipeState.lastDX = 0;
-      viewerSwipeState.lastDY = 0;
-    }, { passive: true });
+      // We capture dragging if not near edge? Or capture ALL?
+      // Let's capture ALL for the viewer functionality.
 
-    viewerContainer.addEventListener('touchmove', (e) => {
-      if (!viewerSwipeState.tracking) return;
-      if (!e.touches || e.touches.length !== 1) return;
+      isDragging = true;
+      startX = touch.clientX;
+      currentX = touch.clientX;
 
-      const t = e.touches[0];
-      const dx = t.clientX - viewerSwipeState.startX;
-      const dy = t.clientY - viewerSwipeState.startY;
-      viewerSwipeState.lastDX = dx;
-      viewerSwipeState.lastDY = dy;
+      // Clear transitions for direct matching
+      trackItems.forEach(t => t.div.style.transition = 'none');
+    }, { passive: false }); // non-passive to allow preventing default
 
-      // Wait for a bit of movement before locking intent
-      if (!viewerSwipeState.lockedHorizontal) {
-        if (Math.abs(dx) < MOBILE_VIEWER_INTENT_THRESHOLD_PX && Math.abs(dy) < MOBILE_VIEWER_INTENT_THRESHOLD_PX) {
-          return;
-        }
-        // If the gesture looks more vertical than horizontal, abandon swipe tracking
-        if (Math.abs(dy) > Math.abs(dx)) {
-          viewerSwipeState.tracking = false;
-          return;
-        }
-        viewerSwipeState.lockedHorizontal = true;
-      }
+    viewerTrack.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const touch = e.touches[0];
+      const dx = touch.clientX - startX;
+      currentX = touch.clientX;
 
-      // From here: treat as horizontal swipe; prevent scrolling/overscroll
-      e.preventDefault();
+      // Prevent browser gestures / scrolling
+      if (e.cancelable) e.preventDefault();
 
-      // Give subtle visual feedback (translate while keeping scale=1 when visible)
-      viewerImage.style.transition = 'none';
-      viewerImage.style.transform = `translateX(${dx}px) scale(1)`;
+      // Move items
+      const width = viewerTrack.clientWidth;
+      const gap = TRACK_GAP_PX;
+
+      // Apply dx
+      // prev at -width-gap
+      // curr at 0
+      // next at width+gap
+
+      if (trackItems[0].div.style.display !== 'none')
+        trackItems[0].div.style.transform = `translateX(${-width - gap + dx}px)`;
+
+      trackItems[1].div.style.transform = `translateX(${dx}px)`;
+
+      if (trackItems[2].div.style.display !== 'none')
+        trackItems[2].div.style.transform = `translateX(${width + gap + dx}px)`;
+
     }, { passive: false });
 
-    function finalizeSwipe() {
-      if (!viewerSwipeState.tracking) return;
+    viewerTrack.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
 
-      const dx = viewerSwipeState.lastDX;
-      const dy = viewerSwipeState.lastDY;
+      const dx = currentX - startX;
+      const width = viewerTrack.clientWidth;
+      const threshold = width * SWIPE_THRESHOLD;
 
-      // Snap back
-      viewerImage.style.transition = 'transform 150ms ease';
-      viewerImage.style.transform = 'translateX(0px) scale(1)';
-      setTimeout(() => {
-        // let CSS own the transform again
-        viewerImage.style.transition = '';
-        viewerImage.style.transform = '';
-      }, 160);
+      // Determine snap
+      // If dx < -threshold -> Next
+      // If dx > threshold -> Prev
+      // Else -> Snap back
 
-      // Trigger nav only if clearly horizontal and exceeds threshold
-      const absDx = Math.abs(dx);
-      const absDy = Math.abs(dy);
-      const horizontalEnough = absDy <= absDx * MOBILE_VIEWER_OFF_AXIS_RATIO;
-
-      if (absDx >= MOBILE_VIEWER_SWIPE_THRESHOLD_PX && horizontalEnough && viewerImages.length > 1) {
-        viewerDidSwipe = true; // suppress "tap-to-close" right after swipe
-        if (dx < 0) {
-          nextImage(); // swipe left => next
-        } else {
-          prevImage(); // swipe right => prev
-        }
-        // Clear the flag shortly after to allow normal taps again
-        setTimeout(() => { viewerDidSwipe = false; }, 250);
+      let dir = null;
+      if (dx < -threshold && viewerIndex < viewerImages.length - 1) {
+        dir = 'next';
+      } else if (dx > threshold && viewerIndex > 0) {
+        dir = 'prev';
       }
 
-      resetViewerSwipeState();
-    }
+      // Animate Result
+      trackItems.forEach(t => t.div.style.transition = 'transform 0.2s ease-out');
+      const gap = TRACK_GAP_PX;
 
-    viewerContainer.addEventListener('touchend', finalizeSwipe, { passive: true });
-    viewerContainer.addEventListener('touchcancel', () => {
-      resetViewerSwipeState();
-    }, { passive: true });
+      if (dir === 'next') {
+        trackItems[1].div.style.transform = `translateX(${-width - gap}px)`;
+        trackItems[2].div.style.transform = `translateX(0px)`;
+        setTimeout(() => {
+          viewerIndex++;
+          updateViewerContent(false);
+        }, 200);
+      } else if (dir === 'prev') {
+        trackItems[1].div.style.transform = `translateX(${width + gap}px)`;
+        trackItems[0].div.style.transform = `translateX(0px)`;
+        setTimeout(() => {
+          viewerIndex--;
+          updateViewerContent(false);
+        }, 200);
+      } else {
+        // Snap back
+        trackItems[0].div.style.transform = `translateX(${-width - gap}px)`;
+        trackItems[1].div.style.transform = `translateX(0px)`;
+        trackItems[2].div.style.transform = `translateX(${width + gap}px)`;
+      }
+    });
   }
 
-  setupMobileViewerSwipe();
-
-  // Close on click outside image (optional but good UX)
+  // Close on click outside (only if not dragged)
   if (imageViewer) imageViewer.addEventListener('click', (e) => {
-    // If the user just swiped, ignore the trailing click/tap
-    if (viewerDidSwipe) return;
+    // We need to differentiate click from drag release.
+    // Ideally, if a drag occurred, we don't close.
+    // The boolean `isDragging` is reset on touchend. 
+    // We can track `hasMoved` in touch logic.
+    // For mouse clicks (desktop): just close if target is container.
 
-    if (e.target === imageViewer || e.target.classList.contains('viewer-image-container')) {
+    // Check if target is image or container
+    if (e.target.classList.contains('viewer-image')) return; // Clicked image: do nothing (or toggle zoom?)
+    if (e.target.classList.contains('viewer-track') ||
+      e.target.classList.contains('viewer-image-container') ||
+      e.target === imageViewer ||
+      e.target.classList.contains('track-item')) {
       closeImageViewer();
     }
   });
