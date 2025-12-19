@@ -2,9 +2,8 @@ BEGIN:VCARD
 VERSION:3.0
 FN:Massimo Piazza
 N:Piazza;Massimo;;;
-ORG:Rivada Space Networks GmbH
 TEL;TYPE=CELL:+39-329-7788-437
-EMAIL;TYPE=INTERNET;X-ABLabel="Email":massimopiazza97@gmail.com
+EMAIL;TYPE=INTERNET;X-ABLabel="Email":info@squareospace.com
 URL;X-ABLabel="Website":https://squareospace.com
 X-SOCIALPROFILE;type=linkedin;X-ABLabel="LinkedIn":https://linkedin.com/in/mpiazza97
 X-SOCIALPROFILE;type=x:http://twitter.com/squareospace
