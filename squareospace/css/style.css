@@ -1307,13 +1307,28 @@ footer {
     right: 0.5rem;
   }
 }
+
 /* Image Loader & Placeholder */
+/* Define custom property for rotation to allow animation */
+@property --loader-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
 .image-loader-wrapper {
   position: relative;
   display: block;
   width: fit-content;
   margin: 0 auto;
   max-width: 100%;
+
+  /* Loader Configuration */
+  --loader-speed: 1.0s;
+  /* Custom easing to create a pulsing velocity effect (never stopping, but accelerating/decelerating) */
+  --loader-ease: cubic-bezier(0.5, 0.2, 0.5, 0.8);
+  --loader-color: var(--accent);
+  --loader-width: 4px;
 }
 
 .image-loader-wrapper img {
@@ -1323,6 +1338,11 @@ footer {
 
 .image-loader-wrapper.loaded img {
   opacity: 1;
+}
+
+.image-loader-wrapper.loaded .loader-overlay {
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
 .loader-overlay {
@@ -1335,11 +1355,6 @@ footer {
   z-index: 10;
 }
 
-.image-loader-wrapper.loaded .loader-overlay {
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
 .loader-overlay svg {
   width: 100%;
   height: 100%;
@@ -1348,27 +1363,56 @@ footer {
 
 .loader-snake {
   fill: none;
-  stroke: var(--accent);
-  stroke-width: 2px;
+  stroke: var(--loader-color);
+  stroke-width: var(--loader-width);
   stroke-linecap: round;
-  /* Dash array relative to pathLength="100" */
-  stroke-dasharray: 25 75; 
-  animation: snake-spin 1.5s linear infinite;
+  /* Round cap for the "head" of the loader */
+  vector-effect: non-scaling-stroke;
+
+  /* The magic: Conic gradient mask to create the fading tail */
+  /* We rotate the mask, not the stroke */
+  /* actually, we need to rotate the "cutout" of the stroke. */
+  /* If we mask the rect with a conic gradient, and rotate the gradient? */
+
+  /* Mask image: conic-gradient from transparent to black */
+  /* We want 0% alpha (transparent) to 100% alpha (opaque) */
+  /* conic-gradient(from var(--loader-angle), transparent 0%, black 100%) */
+  /* Note: standard limitation - mask-image on SVG elements inside SVG might be tricky across browsers.
+     It's better to apply the mask to the .loader-overlay (HTML div) BUT that would mask the center too?
+     No, the SVG is just the border (fill: none). So masking the container works fine!
+  */
+
 }
 
-@keyframes snake-spin {
+/* Apply the mask to the overlay container instead of the path for better compatibility */
+.loader-overlay {
+  -webkit-mask-image: conic-gradient(from var(--loader-angle), transparent 0%, #000 80%, #000 100%);
+  mask-image: conic-gradient(from var(--loader-angle), transparent 0%, #000 80%, #000 100%);
+
+  /* Animate the variable */
+  animation: loader-spin var(--loader-speed) var(--loader-ease) infinite;
+}
+
+@keyframes loader-spin {
   0% {
-    stroke-dashoffset: 0;
+    --loader-angle: 0deg;
   }
+
   100% {
-    stroke-dashoffset: -100;
+    --loader-angle: 360deg;
   }
+}
+
+/* Override the old dasharray animation on the rect */
+.loader-snake {
+  stroke-dasharray: none;
+  animation: none;
 }
 
 /* Integrity fix for Everboard carousel with image wrappers */
 .header_carrousel .screen_wrapper .image-loader-wrapper {
   flex-shrink: 0;
   /* Match the image styling that defined the slide width */
-  width: 229px; 
+  width: 229px;
   margin: 0;
 }
