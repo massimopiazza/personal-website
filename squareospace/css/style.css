@@ -1345,52 +1345,37 @@ footer {
   transition: opacity 0.5s ease;
 }
 
+/* Apply the mask to the overlay container for better compatibility and valid corners */
 .loader-overlay {
+  /* Use CSS border instead of SVG to avoid corner distortion on non-square images */
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
+  /* Ensure border is inside the bounds */
+  border: var(--loader-width) solid var(--loader-color);
+  border-radius: var(--image-radius, 8px);
+  /* Match image radius */
+
   pointer-events: none;
   z-index: 10;
-}
 
-.loader-overlay svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.loader-snake {
-  fill: none;
-  stroke: var(--loader-color);
-  stroke-width: var(--loader-width);
-  stroke-linecap: round;
-  /* Round cap for the "head" of the loader */
-  vector-effect: non-scaling-stroke;
-
-  /* The magic: Conic gradient mask to create the fading tail */
-  /* We rotate the mask, not the stroke */
-  /* actually, we need to rotate the "cutout" of the stroke. */
-  /* If we mask the rect with a conic gradient, and rotate the gradient? */
-
-  /* Mask image: conic-gradient from transparent to black */
-  /* We want 0% alpha (transparent) to 100% alpha (opaque) */
-  /* conic-gradient(from var(--loader-angle), transparent 0%, black 100%) */
-  /* Note: standard limitation - mask-image on SVG elements inside SVG might be tricky across browsers.
-     It's better to apply the mask to the .loader-overlay (HTML div) BUT that would mask the center too?
-     No, the SVG is just the border (fill: none). So masking the container works fine!
-  */
-
-}
-
-/* Apply the mask to the overlay container instead of the path for better compatibility */
-.loader-overlay {
   -webkit-mask-image: conic-gradient(from var(--loader-angle), transparent 0%, #000 80%, #000 100%);
   mask-image: conic-gradient(from var(--loader-angle), transparent 0%, #000 80%, #000 100%);
 
   /* Animate the variable */
   animation: loader-spin var(--loader-speed) var(--loader-ease) infinite;
+}
+
+.loader-overlay svg {
+  display: none;
+}
+
+/* Hide the old SVG elements as we are now using the container border */
+.loader-snake {
+  display: none;
 }
 
 @keyframes loader-spin {
@@ -1401,12 +1386,6 @@ footer {
   100% {
     --loader-angle: 360deg;
   }
-}
-
-/* Override the old dasharray animation on the rect */
-.loader-snake {
-  stroke-dasharray: none;
-  animation: none;
 }
 
 /* Integrity fix for Everboard carousel with image wrappers */
