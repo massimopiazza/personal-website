@@ -53,6 +53,14 @@
   }
 }
 
+/* Reduce footer height on devices without hover (e.g. mobile) to save space */
+@media (hover: none) {
+  :root {
+    --footer-height: 42px;
+    /* 30% thinner than default 60px */
+  }
+}
+
 /* Global resets */
 *,
 *::before,
