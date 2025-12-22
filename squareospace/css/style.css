@@ -1328,12 +1328,14 @@ footer {
   /* Custom easing to create a pulsing velocity effect (never stopping, but accelerating/decelerating) */
   --loader-ease: cubic-bezier(0.5, 0.2, 0.5, 0.8);
   --loader-color: var(--accent);
-  --loader-width: 4px;
+  --loader-width: 2px;
 }
 
 .image-loader-wrapper img {
   opacity: 0;
   transition: opacity 0.5s ease;
+  display: block;
+  /* Remove bottom whitespace gap */
 }
 
 .image-loader-wrapper.loaded img {
