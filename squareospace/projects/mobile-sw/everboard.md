@@ -1,7 +1,7 @@
 <div class="multicol-md">
 
   <div class="multicol-md-text">
-    <img src="img/everboard_icon.svg" alt="Everboard Icon" data-no-zoom style="width: 160px; display: block; margin-top: 0; margin-bottom: 1rem;">
+    <img src="img/everboard_icon.svg" alt="Everboard Icon" data-no-zoom style="width: 160px; display: block; margin-top: 0; margin-bottom: 1rem;" width="167" height="167">
     <p style="margin: 0; padding: 0; text-align: justify;">
       <a href="https://web.archive.org/web/20211202151652/http://everboard.io">Everboard</a> was a versatile iOS keyboard app designed to streamline sharing and enhance messaging by embedding your favorite services directly into your keyboard, eliminating constant app switching.<br><br>
       Many of Everboard’s extensions were available for free, with additional paid add-ons available via an in-app store.<br><br>
@@ -13,35 +13,35 @@
       <div class="c_iphone">
         <div class="iphone_screen">
           <div class="screen_wrapper">
-            <img src="img/everboard-carousel/screenshots/Calendar.jpg" data-icon="1">
-            <img src="img/everboard-carousel/screenshots/Contact.jpg" data-icon="2">
-            <img src="img/everboard-carousel/screenshots/Dropbox.jpg" data-icon="3">
-            <img src="img/everboard-carousel/screenshots/Gif.jpg" data-icon="4">
-            <img src="img/everboard-carousel/screenshots/Google-drive.jpg" data-icon="5">
-            <img src="img/everboard-carousel/screenshots/Hashtag.jpg" data-icon="6">
-            <img src="img/everboard-carousel/screenshots/Meme-generator.jpg" data-icon="7">
-            <img src="img/everboard-carousel/screenshots/New-york-times.jpg" data-icon="8">
-            <img src="img/everboard-carousel/screenshots/Reminder.jpg" data-icon="9">
-            <img src="img/everboard-carousel/screenshots/Translator.jpg" data-icon="10">
-            <img src="img/everboard-carousel/screenshots/Yelp.jpg" data-icon="11">
-            <img src="img/everboard-carousel/screenshots/Youtube.jpg" data-icon="12">
+            <img src="img/everboard-carousel/screenshots/Calendar.jpg" data-icon="1" width="750" height="1334">
+            <img src="img/everboard-carousel/screenshots/Contact.jpg" data-icon="2" width="750" height="1334">
+            <img src="img/everboard-carousel/screenshots/Dropbox.jpg" data-icon="3" width="750" height="1334">
+            <img src="img/everboard-carousel/screenshots/Gif.jpg" data-icon="4" width="750" height="1334">
+            <img src="img/everboard-carousel/screenshots/Google-drive.jpg" data-icon="5" width="750" height="1334">
+            <img src="img/everboard-carousel/screenshots/Hashtag.jpg" data-icon="6" width="750" height="1334">
+            <img src="img/everboard-carousel/screenshots/Meme-generator.jpg" data-icon="7" width="750" height="1334">
+            <img src="img/everboard-carousel/screenshots/New-york-times.jpg" data-icon="8" width="750" height="1334">
+            <img src="img/everboard-carousel/screenshots/Reminder.jpg" data-icon="9" width="750" height="1334">
+            <img src="img/everboard-carousel/screenshots/Translator.jpg" data-icon="10" width="750" height="1334">
+            <img src="img/everboard-carousel/screenshots/Yelp.jpg" data-icon="11" width="719" height="1280">
+            <img src="img/everboard-carousel/screenshots/Youtube.jpg" data-icon="12" width="750" height="1334">
           </div>
         </div>
       </div>
       <div class="c_icons">
         <div class="icon_wrapper">
-          <div class="icon"><img src="img/everboard-carousel/app-icons/Calendar.jpg"></div>
-          <div class="icon"><img src="img/everboard-carousel/app-icons/Contact.jpg"></div>
-          <div class="icon"><img src="img/everboard-carousel/app-icons/Dropbox.jpg"></div>
-          <div class="icon"><img src="img/everboard-carousel/app-icons/Gif.jpg"></div>
-          <div class="icon"><img src="img/everboard-carousel/app-icons/Google-drive.jpg"></div>
-          <div class="icon"><img src="img/everboard-carousel/app-icons/Hashtag.jpg"></div>
-          <div class="icon"><img src="img/everboard-carousel/app-icons/Meme-generator.jpg"></div>
-          <div class="icon"><img src="img/everboard-carousel/app-icons/New-york-times.jpg"></div>
-          <div class="icon"><img src="img/everboard-carousel/app-icons/Reminder.jpg"></div>
-          <div class="icon"><img src="img/everboard-carousel/app-icons/Translator.jpg"></div>
-          <div class="icon"><img src="img/everboard-carousel/app-icons/Yelp.jpg"></div>
-          <div class="icon"><img src="img/everboard-carousel/app-icons/Youtube.jpg"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/Calendar.jpg" width="192" height="192"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/Contact.jpg" width="192" height="192"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/Dropbox.jpg" width="192" height="192"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/Gif.jpg" width="192" height="189"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/Google-drive.jpg" width="192" height="192"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/Hashtag.jpg" width="192" height="192"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/Meme-generator.jpg" width="192" height="192"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/New-york-times.jpg" width="192" height="192"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/Reminder.jpg" width="192" height="192"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/Translator.jpg" width="192" height="192"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/Yelp.jpg" width="192" height="192"></div>
+          <div class="icon"><img src="img/everboard-carousel/app-icons/Youtube.jpg" width="192" height="192"></div>
         </div>
       </div>
     </div>

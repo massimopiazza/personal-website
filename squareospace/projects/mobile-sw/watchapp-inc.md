@@ -7,5 +7,5 @@ I was responsible for developing the entire source code of the apps, while also 
 Our flagship product, Canvas Keyboard, was featured by Apple on the App Store homepage in 157 countries, recognized as one of the world's top 20 apps created by developers under 20. A second app which I developed prior to starting the company (_Vocalarm_) was also featured in that list.
 
 <figure>
-  <img src="img/watchapp-homepage.jpg" alt="WatchApp, Inc. website homepage" style="width:70%">
+  <img src="img/watchapp-homepage.jpg" alt="WatchApp, Inc. website homepage" style="width:70%" width="1754" height="1062">
 </figure>

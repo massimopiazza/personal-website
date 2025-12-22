@@ -13,12 +13,12 @@ During my last year at the company, I also contributed to the design up to PDR s
 
 <div style="display: flex; justify-content: space-between; align-items: center; gap: 5px; flex-wrap: wrap;">
   <figure style="width: 49%; margin: 0; display: flex; flex-direction: column; align-items: center;">
-    <img src="img/azerstellar_16u.jpg" alt="camera and optical testbed" style="width: 100%; height: auto;">
+    <img src="img/azerstellar_16u.jpg" alt="camera and optical testbed" style="width: 100%; height: auto;" width="1616" height="1616">
     <figcaption style="text-align: center;">16U cubesat for autonomous navigation demonstrations and BIU services</figcaption>
   </figure>
 
   <figure style="width: 49%; margin: 0; display: flex; flex-direction: column; align-items: center;">
-    <img src="img/endurance_life-extension.jpg" alt="night sky testing" style="width: 100%; height: auto;">
+    <img src="img/endurance_life-extension.jpg" alt="night sky testing" style="width: 100%; height: auto;" width="1530" height="1530">
     <figcaption style="text-align: center;"><em>Endurance</em> robotic spacecraft for life extension and orbital relocation services</figcaption>
   </figure>
 </div>

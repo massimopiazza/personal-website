@@ -10,7 +10,7 @@ The camera can operate as:
 - **angles-only navigation** sensor, combining onboard image processing with Unscented Kalman Filtering, to achieve relative orbit determination (i.e. estimating 6 orbital DoF of an object from a sequence of monocular 2-DoF bearing angle measurements)
 - **6-DoF pose estimation** sensor (i.e. attitude + position) for close proximity operations — except for terminal rendezvous — enabled by FPGA-based acceleration of convolutional neural networks
 <figure>
-  <img src="img/camera_and_LRF_assembled.jpg" alt="camera and LRF" style="width:85%">
+  <img src="img/camera_and_LRF_assembled.jpg" alt="camera and LRF" style="width:85%" width="1920" height="1244">
   <figcaption>
     <div style="width:85%">
       Proximity navigation camera / star tracker (right) and laser range finder (left)
@@ -32,12 +32,12 @@ My cross-functional role led me to work across **hardware**, **software**, **sim
 
 <div style="display: flex; justify-content: space-between; align-items: center; gap: 5px; flex-wrap: wrap;">
   <figure style="width: 56%; margin: 0; display: flex; flex-direction: column; align-items: center;">
-    <img src="img/camera_calibration_testbed.jpg" alt="camera and optical testbed" style="width: 100%; height: auto;">
+    <img src="img/camera_calibration_testbed.jpg" alt="camera and optical testbed" style="width: 100%; height: auto;" width="1200" height="752">
     <figcaption style="text-align: center;">Engineering model of the camera on optical testbed</figcaption>
   </figure>
 
   <figure style="width: 42%; margin: 0; display: flex; flex-direction: column; align-items: center;">
-    <img src="img/ST_night_sky_testing.jpg" alt="night sky testing" style="width: 100%; height: auto;">
+    <img src="img/ST_night_sky_testing.jpg" alt="night sky testing" style="width: 100%; height: auto;" width="1280" height="1464">
     <figcaption style="text-align: center;">Tripod-mounted camera during night sky testing campaign</figcaption>
   </figure>
 </div>

@@ -1307,3 +1307,68 @@ footer {
     right: 0.5rem;
   }
 }
+/* Image Loader & Placeholder */
+.image-loader-wrapper {
+  position: relative;
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+.image-loader-wrapper img {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.image-loader-wrapper.loaded img {
+  opacity: 1;
+}
+
+.loader-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.image-loader-wrapper.loaded .loader-overlay {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.loader-overlay svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.loader-snake {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2px;
+  stroke-linecap: round;
+  /* Dash array relative to pathLength="100" */
+  stroke-dasharray: 25 75; 
+  animation: snake-spin 1.5s linear infinite;
+}
+
+@keyframes snake-spin {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -100;
+  }
+}
+
+/* Integrity fix for Everboard carousel with image wrappers */
+.header_carrousel .screen_wrapper .image-loader-wrapper {
+  flex-shrink: 0;
+  /* Match the image styling that defined the slide width */
+  width: 229px; 
+  margin: 0;
+}

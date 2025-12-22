@@ -366,6 +366,66 @@ document.addEventListener('DOMContentLoaded', () => {
     detailContent.querySelectorAll('a').forEach(link => link.setAttribute('target', '_blank'));
     adjustTitleFontSize();
 
+    // Setup Image Placeholder & Loader
+    const lazyImages = Array.from(detailContent.querySelectorAll('img'));
+    lazyImages.forEach(img => {
+      const isIcon = img.closest('.icon_wrapper') ||
+        img.hasAttribute('data-no-zoom') ||
+        (img.getAttribute('alt') || '').includes('#no-zoom');
+
+      if (isIcon) return;
+
+      // Wrap if not loaded (or always wrap to ensure consistent layout? 
+      // If we only wrap !complete, cached images have no wrapper. 
+      // If wrapper has styles that affect layout (like width), this is inconsistent.
+      // But we copied style.width to wrapper.
+      // Better to check complete to avoid "loading" state, but maybe consistently wrap for safety?
+      // No, existing images without wrapper are fine.
+      if (img.complete && img.naturalHeight !== 0) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'image-loader-wrapper';
+      if (img.style.width) {
+        wrapper.style.width = img.style.width;
+        img.style.width = '100%';
+        img.style.height = 'auto';
+      }
+
+      img.parentNode.insertBefore(wrapper, img);
+      wrapper.appendChild(img);
+
+      const wAttr = img.getAttribute('width');
+      const hAttr = img.getAttribute('height');
+      // Default to 100 space if unknown, but script should have populated it
+      const viewBox = (wAttr && hAttr) ? `0 0 ${wAttr} ${hAttr}` : '0 0 100 100';
+      // Rx estimation: 1.5% of width or fixed? Fixed 20 seems okay for high-res.
+      const rx = wAttr ? Math.max(8, wAttr * 0.015) : 8;
+
+      const loader = document.createElement('div');
+      loader.className = 'loader-overlay';
+      loader.innerHTML = `
+        <svg viewBox="${viewBox}" preserveAspectRatio="none">
+          <rect x="0" y="0" width="${wAttr || 100}" height="${hAttr || 100}" 
+                rx="${rx}" ry="${rx}"
+                pathLength="100" class="loader-snake" vector-effect="non-scaling-stroke" />
+        </svg>
+      `;
+
+      wrapper.appendChild(loader);
+      wrapper.classList.add('loading');
+
+      img.onload = () => {
+        wrapper.classList.remove('loading');
+        wrapper.classList.add('loaded');
+        setTimeout(() => { if (loader.parentNode) loader.remove(); }, 600);
+      };
+
+      // Safety check in case it loaded while executing
+      if (img.complete && img.naturalHeight !== 0) {
+        img.onload();
+      }
+    });
+
     // Setup Image Viewer
     const allImages = Array.from(detailContent.querySelectorAll('img'));
 

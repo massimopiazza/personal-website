@@ -7,7 +7,7 @@ The program was centered around developing a jet-powered composite UAV, entirely
 One year later, I become the **Head of AFD**, hence leading the teams across both the UAV and sounding rocket programs.
 
 <figure>
-  <img src="img/cyrano-render.jpg" alt="Cyrano UAV rendering" style="width:85%">
+  <img src="img/cyrano-render.jpg" alt="Cyrano UAV rendering" style="width:85%" width="1906" height="868">
   <figcaption>
     <div style="width:85%">
       Rendering of Skyward's <em>Cyrano I-X</em> UAV, with pylon-mounted sounding rocket (<em>Rocksanne I-X</em>)
