@@ -32,11 +32,24 @@ document.addEventListener('DOMContentLoaded', () => {
   function createTrackItem() {
     const div = document.createElement('div');
     div.classList.add('track-item');
+
+    // Wrapper for strict centering of image + attached caption
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('viewer-content-wrapper');
+
     const img = document.createElement('img');
     img.classList.add('viewer-image');
+    img.img = img; // Self-reference for legacy compatibility if needed, though clean code prefers direct access
     img.draggable = false; // Disable native drag
-    div.appendChild(img);
-    return { div, img };
+
+    const caption = document.createElement('div');
+    caption.classList.add('viewer-dynamic-caption');
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(caption);
+    div.appendChild(wrapper);
+
+    return { div, img, caption };
   }
 
   function initTrack() {
@@ -69,8 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       imageViewer.classList.add('hidden');
       // Clear sources to stop memory usage
-      trackItems.forEach(item => item.img.src = '');
-      viewerCaption.textContent = '';
+      trackItems.forEach(item => {
+        item.img.src = '';
+        item.caption.textContent = '';
+      });
+      if (viewerCaption) viewerCaption.textContent = '';
       viewerCounter.textContent = '';
     }, 300);
     document.removeEventListener('keydown', handleViewerKeydown);
@@ -104,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (item.img.getAttribute('src') !== data.src) {
           item.img.src = data.src;
           item.img.alt = data.alt;
+          item.caption.textContent = data.alt.replace('#no-zoom', '').trim();
         }
         item.div.style.display = 'flex';
       } else {
@@ -118,11 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Position items
       resetTrackPositions();
-    }
-
-    // Update Caption (Current Image)
-    if (currData) {
-      viewerCaption.textContent = currData.alt.replace('#no-zoom', '').trim();
     }
 
     // Update Counter
