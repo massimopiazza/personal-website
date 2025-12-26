@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (item.img.getAttribute('src') !== data.src) {
           item.img.src = data.src;
           item.img.alt = data.alt;
-          item.caption.textContent = data.alt.replace('#no-zoom', '').trim();
+          item.caption.textContent = data.caption;
         }
         item.div.style.display = 'flex';
       } else {
@@ -457,10 +457,20 @@ document.addEventListener('DOMContentLoaded', () => {
       return true;
     });
 
-    viewerImages = zoomableImages.map(img => ({
-      src: img.src,
-      alt: img.getAttribute('alt') || ''
-    }));
+    viewerImages = zoomableImages.map(img => {
+      const alt = img.getAttribute('alt') || '';
+      let caption = alt;
+      const figure = img.closest('figure');
+      const figCap = figure ? figure.querySelector('figcaption') : null;
+      if (figCap && figCap.textContent.trim()) {
+        caption = figCap.textContent;
+      }
+      return {
+        src: img.src,
+        alt: alt,
+        caption: caption.replace('#no-zoom', '').trim()
+      };
+    });
     zoomableImages.forEach((img, index) => {
       img.classList.add('zoomable');
       img.addEventListener('click', () => {
