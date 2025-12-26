@@ -45,6 +45,8 @@
   --image-radius: 8px;
   /* Top bar and Footer background */
   --bar-bg: rgb(21, 0, 0);
+  /* Table styling */
+  --table-border: 1px solid #000;
 }
 
 /* Responsive adjustments */
@@ -813,8 +815,8 @@ footer {
   border-collapse: separate;
   border-spacing: 0.25rem 0.25rem;
   margin-bottom: 1rem;
-  border-top: 1px solid #000;
-  border-bottom: 1px solid #000;
+  border-top: var(--table-border);
+  border-bottom: var(--table-border);
 }
 
 .detail-body th,
