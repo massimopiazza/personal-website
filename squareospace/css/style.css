@@ -1434,3 +1434,89 @@ footer {
   width: 229px;
   margin: 0;
 }
+
+/* Mobile Navigation Buttons in Project Detail View */
+.detail-nav-buttons {
+  display: none;
+  width: 100%;
+  justify-content: space-between;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  margin-bottom: -1rem;
+  border-top: 1px solid #eee;
+}
+
+@media (max-width: 767px) {
+  .detail-nav-buttons {
+    display: flex;
+  }
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  color: var(--accent);
+  font-family: 'TitleDefense', sans-serif;
+  font-size: 1rem;
+
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  max-width: 50%;
+  transition: background-color 0.3s ease;
+  border-radius: var(--hover-overlay-radius);
+}
+
+.nav-btn:hover {
+  background-color: var(--dark-hover);
+}
+
+.nav-text {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  /* Allow text to shrink/truncate */
+  min-width: 0;
+}
+
+.nav-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke: var(--accent);
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.nav-btn.prev {
+  text-align: left;
+}
+
+.nav-btn.next {
+  text-align: right;
+  /* Next button is aligned right via flexbox, but keep text aligned right inside */
+}
+
+.nav-btn.prev .nav-text {
+  margin-left: 0.5rem;
+}
+
+.nav-btn.next .nav-text {
+  margin-right: 0.5rem;
+}
+
+.nav-icon.left {
+  transform: rotate(90deg);
+}
+
+.nav-icon.right {
+  transform: rotate(-90deg);
+}

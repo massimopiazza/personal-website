@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  function displayMarkdown(md) {
+  function displayMarkdown(md, navInfo = null) {
     spinner.classList.add('hidden');
     detailContent.innerHTML = marked.parse(md);
     initEverboardCarousel(detailContent);
@@ -477,6 +477,54 @@ document.addEventListener('DOMContentLoaded', () => {
         openImageViewer(index);
       });
     });
+
+    // Inject Navigation Buttons (Mobile Only)
+    if (navInfo && (navInfo.prev || navInfo.next)) {
+      const navContainer = document.createElement('div');
+      navContainer.className = 'detail-nav-buttons';
+
+      // Previous Button
+      if (navInfo.prev) {
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'nav-btn prev';
+        prevBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="nav-icon left">
+            <polyline points="6,10 12,16 18,10" />
+          </svg>
+          <span class="nav-text">${navInfo.prev.name}</span>
+        `;
+        prevBtn.onclick = (e) => {
+          e.stopPropagation();
+          const originalLink = document.querySelector(`.accordion-content a[data-project="${navInfo.prev.path}"]`);
+          if (originalLink) originalLink.click();
+        };
+        navContainer.appendChild(prevBtn);
+      }
+
+      // Next Button
+      if (navInfo.next) {
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'nav-btn next';
+        nextBtn.innerHTML = `
+          <span class="nav-text">${navInfo.next.name}</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="nav-icon right">
+            <polyline points="6,10 12,16 18,10" />
+          </svg>
+        `;
+        nextBtn.onclick = (e) => {
+          e.stopPropagation();
+          const originalLink = document.querySelector(`.accordion-content a[data-project="${navInfo.next.path}"]`);
+          if (originalLink) originalLink.click();
+        };
+        // If there is no prev button, push to right
+        if (!navInfo.prev) {
+          nextBtn.style.marginLeft = 'auto'; // push to right
+        }
+        navContainer.appendChild(nextBtn);
+      }
+
+      detailContent.appendChild(navContainer);
+    }
   }
   // Navigation indicator setup
   const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height'));
@@ -717,6 +765,38 @@ document.addEventListener('DOMContentLoaded', () => {
       detailTitle.textContent = title;
       const mdPath = link.getAttribute('data-project');
       const projectId = mdPath.split('/').pop().replace('.md', '');
+
+      // Determine navigation context (Previous/Next in same accordion section)
+      let navInfo = { prev: null, next: null };
+      try {
+        const item = link.closest('li');
+        if (item) {
+          const list = item.parentElement;
+          if (list && list.tagName === 'UL') {
+            const siblings = Array.from(list.querySelectorAll('a[data-project]'));
+            if (siblings.length > 1) {
+              const currentIndex = siblings.indexOf(link);
+              if (currentIndex > 0) {
+                const prevLink = siblings[currentIndex - 1];
+                navInfo.prev = {
+                  name: prevLink.textContent,
+                  path: prevLink.getAttribute('data-project')
+                };
+              }
+              if (currentIndex < siblings.length - 1) {
+                const nextLink = siblings[currentIndex + 1];
+                navInfo.next = {
+                  name: nextLink.textContent,
+                  path: nextLink.getAttribute('data-project')
+                };
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Navigation context could not be determined:', err);
+      }
+
       // Clear old content and show spinner
       detailContent.innerHTML = '';
       spinner.classList.remove('hidden');
@@ -733,11 +813,11 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         })
         .then(md => {
-          displayMarkdown(md);
+          displayMarkdown(md, navInfo);
         })
         .catch(err => {
-          if (projectsContent && projectsContent[projectId]) {
-            displayMarkdown(projectsContent[projectId]);
+          if (typeof projectsContent !== 'undefined' && projectsContent[projectId]) {
+            displayMarkdown(projectsContent[projectId], navInfo);
           } else {
             spinner.classList.add('hidden');
             detailContent.innerHTML = '<p>Error loading project details. Please run the site via an HTTP server (e.g., python3 -m http.server).</p>';
