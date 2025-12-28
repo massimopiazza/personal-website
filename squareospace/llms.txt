@@ -1,0 +1,59 @@
+# SquareOSpace (Massimo Piazza)
+
+> Personal portfolio + consulting site for Massimo Piazza (aerospace systems engineer; AI/computer vision; space telecom). Contains concise project write-ups, publications, and consulting offer details, intended to be used as a reliable reference for questions about Massimo’s work, experience, and past projects.
+
+Notes for LLMs/agents:
+- Prefer the project Markdown pages below as primary sources (they are already clean, content-first Markdown).
+- The homepage is a high-level overview (bio + consulting + project navigation) and may be useful for summaries.
+- Last site-wide content refresh in the current sitemap: 2025-11-07.
+
+## Home
+
+- [Homepage](https://squareospace.com/): Bio, skills focus areas, project navigation, consulting overview, contact form
+
+## Consulting
+
+- [Consulting section](https://squareospace.com/#consulting): Core expertise, engagement models, and how to work together
+
+## Work & Projects — Vision-based navigation
+
+- [CNN-based spacecraft pose estimation](https://squareospace.com/projects/vision-based-navigation/cnn-based-spacecraft-pose-estimation.md): Deep learning pipelines for spacecraft pose estimation; synthetic rendering; Kalman filtering; hardware deployment considerations
+- [Proximity navigation camera & star tracker](https://squareospace.com/projects/vision-based-navigation/io-camera.md): Space-grade camera with edge processing; star tracking; angles-only navigation; on-orbit testing and calibration work
+- [Robotic testbed](https://squareospace.com/projects/vision-based-navigation/robotic-testbed.md): HIL validation with dual UR10e arms, motion capture, ROS control architecture, dataset acquisition
+- [Patent](https://squareospace.com/projects/vision-based-navigation/patent.md): Vision-only autonomous proximity navigation system; jurisdictions and status; inventors/assignee
+
+## Work & Projects — Systems engineering
+
+- [Satellite telecommunications](https://squareospace.com/projects/systems-engineering/satellite-telecommunications.md): LEO constellation systems engineering; budgets, interfaces, MBSE/toolchain integration; gateway-less network architecture overview
+- [Small-sats & on-orbit servicing](https://squareospace.com/projects/systems-engineering/io-smallsats-and-servicing.md): Mission/system support for smallsat demos and GEO servicing concepts (including Endurance concept work)
+
+## Academia
+
+- [Publications](https://squareospace.com/projects/academia/publications.md): Peer-reviewed and conference publications with links/DOIs
+- [Skyward Experimental Rocketry](https://squareospace.com/projects/academia/skyward.md): Student rocketry/UAV programs; leadership and contributions
+- [Various projects](https://squareospace.com/projects/academia/various-projects.md): Selected academic projects with downloadable PDFs/slides
+
+## Mobile software
+
+- [WatchApp, Inc. — Co-founder & CTO](https://squareospace.com/projects/mobile-sw/watchapp-inc.md): Company and products overview; responsibilities and recognition
+- [Canvas Keyboard (2015)](https://squareospace.com/projects/mobile-sw/canvas-keyboard.md): Gesture-based iOS keyboard product; features and demos
+- [Everboard (2016)](https://squareospace.com/projects/mobile-sw/everboard.md): iOS keyboard extensions; integrations and feature set
+
+## Profiles
+
+- [LinkedIn](https://www.linkedin.com/in/mpiazza97/): Professional profile
+- [GitHub](https://github.com/massimopiazza): Code/projects
+- [X](https://x.com/squareospace): Updates & opinions
+
+## Various
+- [Resume (PDF)](https://squareospace.com/files/resume_massimo-piazza.pdf): Downloadable resume/CV
+- [Contact card (VCF)](https://squareospace.com/files/massimo-piazza.vcf): vCard contact
+- [MSc thesis (PDF)](https://squareospace.com/files/msc_thesis.pdf): Thesis document
+- [MARS-PENGUIN report (PDF)](https://squareospace.com/files/polimi-mars-penguin.pdf): Mission design report
+- [MARS-PENGUIN slides (PDF)](https://squareospace.com/files/polimi-mars-penguin-slides.pdf): Slides
+- [Orbital mechanics report (PDF)](https://squareospace.com/files/polimi-orbital-mechanics.pdf): Final project report
+- [Propulsion report (PDF)](https://squareospace.com/files/polimi-propulsion.pdf): Final project report
+- [Telecommunications report (PDF)](https://squareospace.com/files/polimi-telecom.pdf): Final project report
+
+- [robots.txt](https://squareospace.com/robots.txt): Crawler directives
+- [sitemap.xml](https://squareospace.com/sitemap.xml): Full URL list and lastmod dates

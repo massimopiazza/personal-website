@@ -1,3 +1,0 @@
-# Finance
-
-Details coming soon.
