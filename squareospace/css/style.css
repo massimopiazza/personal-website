@@ -45,6 +45,8 @@
   --image-radius: 8px;
   /* Top bar and Footer background */
   --bar-bg: rgb(21, 0, 0);
+  --bar-glass-bg: rgba(11, 0, 0, 0.825);
+  /* voluntarily dimmer red on glass bg to compensate for transparency over white  */
   /* Table styling */
   --table-border: 1px solid #000;
 }
@@ -494,6 +496,17 @@ footer {
     /* Transformation numerically calculated using https://codepen.io/sosuke/pen/Pjoqqp */
     /*filter: brightness(0) saturate(100%) invert(77%) sepia(16%) saturate(611%) hue-rotate(315deg) brightness(93%) contrast(74%);*/
     filter: invert(50%);
+  }
+}
+
+/* Liquid Glass Effect */
+@supports ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+
+  nav,
+  footer {
+    background: var(--bar-glass-bg);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    backdrop-filter: blur(10px) saturate(180%);
   }
 }
 
