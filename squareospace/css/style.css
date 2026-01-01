@@ -500,6 +500,7 @@ footer {
 }
 
 /* Liquid Glass Effect */
+/*
 @supports ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
 
   nav,
@@ -509,6 +510,7 @@ footer {
     backdrop-filter: blur(10px) saturate(180%);
   }
 }
+*/
 
 /* Detail-view panel */
 .detail-view {
