@@ -29,6 +29,39 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentX = 0;
   let isAnimating = false;
 
+  // Zoom State
+  let zoomState = {
+    scale: 1,
+    translateX: 0,
+    translateY: 0,
+    isPinching: false,
+    startDist: 0,
+    startScale: 1,
+    lastTapTime: 0, // for double tap
+    pinchCenter: { x: 0, y: 0 },
+    startTranslate: { x: 0, y: 0 },
+    isPanning: false,
+    panStart: { x: 0, y: 0 },
+    panCurrent: { x: 0, y: 0 }
+  };
+
+  function resetZoom() {
+    zoomState.scale = 1;
+    zoomState.translateX = 0;
+    zoomState.translateY = 0;
+    zoomState.isPinching = false;
+    zoomState.isPanning = false;
+
+    // Reset all track images to ensure clean state
+    trackItems.forEach(item => {
+      item.img.style.transform = 'translate(0px, 0px) scale(1)';
+      // Ensure transition is reset if we were animating zoom
+      item.img.style.transition = 'none';
+      // Reset transform origin to center
+      item.img.style.transformOrigin = 'center center';
+    });
+  }
+
   function createTrackItem() {
     const div = document.createElement('div');
     div.classList.add('track-item');
@@ -49,7 +82,26 @@ document.addEventListener('DOMContentLoaded', () => {
     wrapper.appendChild(caption);
     div.appendChild(wrapper);
 
+    const updateBorder = () => updateImageBorderRadius(img);
+    img.onload = updateBorder;
+    // Also observe resize just in case? Or rely on window resize
     return { div, img, caption };
+  }
+
+  function updateImageBorderRadius(img) {
+    if (!img) return;
+    // Mobile check: usually we only care if < 768px, but doing it always is safe 
+    // if CSS class only affects mobile via media query (which we did).
+
+    // Check if image is practically full width
+    const trackWidth = viewerTrack ? viewerTrack.clientWidth : window.innerWidth;
+    const isFullWidth = img.offsetWidth >= trackWidth - 2; // small tolerance
+
+    if (isFullWidth) {
+      img.classList.add('full-width');
+    } else {
+      img.classList.remove('full-width');
+    }
   }
 
   function initTrack() {
@@ -67,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTrack();
 
   function openImageViewer(index) {
+    document.body.style.overflow = 'hidden'; // Disable background scroll
     viewerIndex = index;
     updateViewerContent(false); // Immediate update without animation
     imageViewer.classList.remove('hidden');
@@ -78,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function closeImageViewer() {
+    document.body.style.overflow = ''; // Re-enable background scroll
     imageViewer.classList.remove('visible');
     setTimeout(() => {
       imageViewer.classList.add('hidden');
@@ -121,8 +175,17 @@ document.addEventListener('DOMContentLoaded', () => {
           item.img.src = data.src;
           item.img.alt = data.alt;
           item.caption.textContent = data.caption;
+          // Reset full-width class until load/check
+          item.img.classList.remove('full-width');
+
+          // Should check immediately if cached
+          if (item.img.complete) {
+            updateImageBorderRadius(item.img);
+          }
         }
         item.div.style.display = 'flex';
+        // Force check again for current item as it might be already loaded/displayed
+        updateImageBorderRadius(item.img);
       } else {
         item.div.style.display = 'none';
       }
@@ -131,7 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!animate) {
       setItem(prevItem, prevData);
       setItem(currItem, currData);
+      setItem(prevItem, prevData);
+      setItem(currItem, currData);
       setItem(nextItem, nextData);
+
+      resetZoom(); // Start fresh for new image
 
       // Position items
       resetTrackPositions();
@@ -173,7 +240,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // trackItems[2] = next
     trackItems[2].div.style.transform = `translateX(${width + gap}px)`;
 
-    trackItems.forEach(t => t.div.style.transition = 'none');
+    trackItems.forEach(t => {
+      t.div.style.transition = 'none';
+      updateImageBorderRadius(t.img);
+    });
   }
 
   // Handle window resize to prevent overlapping images
@@ -241,115 +311,239 @@ document.addEventListener('DOMContentLoaded', () => {
   if (viewerNext) viewerNext.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
   if (viewerPrev) viewerPrev.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
 
-  // Mobile Swipe Logic (Continuous Physics)
-  // Only enable if multiple images
-  const edgeThreshold = 30; // disable swipe if start near edge
+  // Mobile Swipe & Zoom Logic
+  // Only enable if track exists
+  const edgeThreshold = 30; // disable swipe start if near edge
 
   if (viewerTrack) {
+    // Utility to get distance between two touches
+    const getDist = (t1, t2) => {
+      return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+    };
+
+    // Utility to get center of two touches
+    const getCenter = (t1, t2) => {
+      return {
+        x: (t1.clientX + t2.clientX) / 2,
+        y: (t1.clientY + t2.clientY) / 2
+      };
+    };
+
     viewerTrack.addEventListener('touchstart', (e) => {
-      if (viewerImages.length <= 1) return;
       if (isAnimating) return;
 
-      const touch = e.touches[0];
+      const touches = e.touches;
 
-      // Edge guard for browser back gesture (Swipe right from left edge)
-      if (touch.clientX < edgeThreshold) {
-        // Let the browser handle it... OR prevent it? 
-        // User asked: "On mobile only ... disabled ... As you close it, enabled."
-        // We preventDefault here to try to block browser back, but iOS is aggressive.
-        // But we can only preventDefault if usage is passive: false.
-        // Let's assume passive: false for touchmove. 
-        // BUT: if we preventDefault on touchstart, we stop all scrolling/clicks.
-        // Since this is the viewer, stopping all scrolling is GOOD.
-        // We want the viewer to be the only thing consuming touches.
-      } else if (touch.clientX > window.innerWidth - edgeThreshold) {
-        // Right edge
+      // --- PINCH START (2 fingers) ---
+      if (touches.length === 2) {
+        // If we were swiping, cancel it
+        isDragging = false;
+
+        zoomState.isPinching = true;
+        zoomState.startDist = getDist(touches[0], touches[1]);
+        zoomState.startScale = zoomState.scale;
+
+        // Calculate center to zoom towards? 
+        // For simplicity and "Apple-like" feel without complex matrix math:
+        // We will stick to center-based scaling for the heavy lifting, 
+        // but maybe adjust translate to keep focus? 
+        // Let's rely on standard center-center transform origin and translation updates.
+
+        e.preventDefault();
+        return;
       }
 
-      // We capture dragging if not near edge? Or capture ALL?
-      // Let's capture ALL for the viewer functionality.
+      // --- SINGLE TOUCH: Swipe or Pan or Double Tap ---
+      if (touches.length === 1) {
+        const touch = touches[0];
 
-      isDragging = true;
-      startX = touch.clientX;
-      currentX = touch.clientX;
+        // Double Tap Detection
+        const now = Date.now();
+        if (now - zoomState.lastTapTime < 300) {
+          // Double Tap!
+          e.preventDefault();
+          handleDoubleTap(touch.clientX, touch.clientY);
+          zoomState.lastTapTime = 0; // consume
+          return;
+        }
+        zoomState.lastTapTime = now;
 
-      // Clear transitions for direct matching
-      trackItems.forEach(t => t.div.style.transition = 'none');
-    }, { passive: false }); // non-passive to allow preventing default
+        // If currently zoomed in -> PAN
+        if (zoomState.scale > 1.05) { // tolerance for float 1.0
+          zoomState.isPanning = true;
+          zoomState.panStart = { x: touch.clientX, y: touch.clientY };
+          zoomState.startTranslate = { x: zoomState.translateX, y: zoomState.translateY };
+          e.preventDefault();
+          return;
+        }
+
+        // If zoomed out (scale=1) -> SWIPE (Existing logic)
+        // Edge guard
+        // if (touch.clientX < edgeThreshold) return; // Optional
+
+        if (viewerImages.length > 1) {
+          isDragging = true;
+          startX = touch.clientX;
+          currentX = touch.clientX;
+          // Clear transitions for direct manipulation
+          trackItems.forEach(t => t.div.style.transition = 'none');
+        }
+      }
+    }, { passive: false });
 
     viewerTrack.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const touch = e.touches[0];
-      const dx = touch.clientX - startX;
-      currentX = touch.clientX;
+      const touches = e.touches;
 
-      // Prevent browser gestures / scrolling
-      if (e.cancelable) e.preventDefault();
+      // --- PINCH MOVE ---
+      if (zoomState.isPinching && touches.length === 2) {
+        e.preventDefault();
+        const dist = getDist(touches[0], touches[1]);
+        if (dist === 0) return;
 
-      // Move items
-      const width = viewerTrack.clientWidth;
-      const gap = TRACK_GAP_PX;
+        const scaleFactor = dist / zoomState.startDist;
+        let newScale = zoomState.startScale * scaleFactor;
 
-      // Apply dx
-      // prev at -width-gap
-      // curr at 0
-      // next at width+gap
+        // Clamp scale
+        newScale = Math.min(Math.max(1, newScale), 4);
 
-      if (trackItems[0].div.style.display !== 'none')
-        trackItems[0].div.style.transform = `translateX(${-width - gap + dx}px)`;
+        zoomState.scale = newScale;
+        applyZoom();
+        return;
+      }
 
-      trackItems[1].div.style.transform = `translateX(${dx}px)`;
+      // --- SINGLE TOUCH MOVE ---
+      if (touches.length === 1) {
+        // --- PAN ---
+        if (zoomState.isPanning) {
+          e.preventDefault();
+          const touch = touches[0];
+          const dx = touch.clientX - zoomState.panStart.x;
+          const dy = touch.clientY - zoomState.panStart.y;
 
-      if (trackItems[2].div.style.display !== 'none')
-        trackItems[2].div.style.transform = `translateX(${width + gap + dx}px)`;
+          // Update translation
+          // We allow free panning but logically it should be bounded.
+          // For seamless feel, free pan with maybe some resistance is ok, 
+          // but keeping image within view is better. 
+          // Let's implement simple free pan for now to ensure smoothness.
+          zoomState.translateX = zoomState.startTranslate.x + dx;
+          zoomState.translateY = zoomState.startTranslate.y + dy;
 
+          applyZoom();
+          return;
+        }
+
+        // --- SWIPE (only if dragging enabled) ---
+        if (isDragging) {
+          // Prevent Browser Scroll
+          if (e.cancelable) e.preventDefault();
+
+          const touch = touches[0];
+          const dx = touch.clientX - startX;
+          currentX = touch.clientX;
+
+          const width = viewerTrack.clientWidth;
+          const gap = TRACK_GAP_PX;
+
+          // Update Track positions
+          // trackItems[0] = prev, [1] = curr, [2] = next
+          if (trackItems[0].div.style.display !== 'none')
+            trackItems[0].div.style.transform = `translateX(${-width - gap + dx}px)`;
+
+          trackItems[1].div.style.transform = `translateX(${dx}px)`;
+
+          if (trackItems[2].div.style.display !== 'none')
+            trackItems[2].div.style.transform = `translateX(${width + gap + dx}px)`;
+        }
+      }
     }, { passive: false });
 
     viewerTrack.addEventListener('touchend', (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-
-      const dx = currentX - startX;
-      const width = viewerTrack.clientWidth;
-      const threshold = width * SWIPE_THRESHOLD;
-
-      // Determine snap
-      // If dx < -threshold -> Next
-      // If dx > threshold -> Prev
-      // Else -> Snap back
-
-      let dir = null;
-      if (dx < -threshold && viewerIndex < viewerImages.length - 1) {
-        dir = 'next';
-      } else if (dx > threshold && viewerIndex > 0) {
-        dir = 'prev';
+      // If we were pinching
+      if (zoomState.isPinching) {
+        if (e.touches.length === 0) {
+          zoomState.isPinching = false;
+          // Snap check? If scale < 1, snap to 1.
+          if (zoomState.scale < 1) {
+            zoomState.scale = 1;
+            zoomState.translateX = 0;
+            zoomState.translateY = 0;
+            applyZoom(true); // animate snap
+          }
+        }
+        return;
       }
 
-      // Animate Result
-      trackItems.forEach(t => t.div.style.transition = 'transform 0.2s ease-out');
-      const gap = TRACK_GAP_PX;
+      // If we were panning
+      if (zoomState.isPanning) {
+        if (e.touches.length === 0) {
+          zoomState.isPanning = false;
+          // Boundary checks could happen here to "bounce back" if panned too far
+        }
+        return;
+      }
 
-      if (dir === 'next') {
-        trackItems[1].div.style.transform = `translateX(${-width - gap}px)`;
-        trackItems[2].div.style.transform = `translateX(0px)`;
-        setTimeout(() => {
-          viewerIndex++;
-          updateViewerContent(false);
-        }, 200);
-      } else if (dir === 'prev') {
-        trackItems[1].div.style.transform = `translateX(${width + gap}px)`;
-        trackItems[0].div.style.transform = `translateX(0px)`;
-        setTimeout(() => {
-          viewerIndex--;
-          updateViewerContent(false);
-        }, 200);
-      } else {
-        // Snap back
-        trackItems[0].div.style.transform = `translateX(${-width - gap}px)`;
-        trackItems[1].div.style.transform = `translateX(0px)`;
-        trackItems[2].div.style.transform = `translateX(${width + gap}px)`;
+      // If we were swiping
+      if (isDragging) {
+        isDragging = false;
+        // ... existing swipe end logic ...
+        const dx = currentX - startX;
+        const width = viewerTrack.clientWidth;
+        const threshold = width * SWIPE_THRESHOLD;
+
+        let dir = null;
+        if (dx < -threshold && viewerIndex < viewerImages.length - 1) {
+          dir = 'next';
+        } else if (dx > threshold && viewerIndex > 0) {
+          dir = 'prev';
+        }
+
+        trackItems.forEach(t => t.div.style.transition = 'transform 0.2s ease-out');
+        const gap = TRACK_GAP_PX;
+
+        if (dir === 'next') {
+          trackItems[1].div.style.transform = `translateX(${-width - gap}px)`;
+          trackItems[2].div.style.transform = `translateX(0px)`;
+          setTimeout(() => { viewerIndex++; updateViewerContent(false); }, 200);
+        } else if (dir === 'prev') {
+          trackItems[1].div.style.transform = `translateX(${width + gap}px)`;
+          trackItems[0].div.style.transform = `translateX(0px)`;
+          setTimeout(() => { viewerIndex--; updateViewerContent(false); }, 200);
+        } else {
+          // Snap back
+          trackItems[0].div.style.transform = `translateX(${-width - gap}px)`;
+          trackItems[1].div.style.transform = `translateX(0px)`;
+          trackItems[2].div.style.transform = `translateX(${width + gap}px)`;
+        }
       }
     });
+
+    function applyZoom(animate = false) {
+      const img = trackItems[1].img;
+      if (!img) return;
+
+      if (animate) img.style.transition = 'transform 0.2s ease-out';
+      else img.style.transition = 'none';
+
+      img.style.transform = `translate(${zoomState.translateX}px, ${zoomState.translateY}px) scale(${zoomState.scale})`;
+    }
+
+    function handleDoubleTap(x, y) {
+      if (zoomState.scale > 1) {
+        // Zoom out to 1
+        zoomState.scale = 1;
+        zoomState.translateX = 0;
+        zoomState.translateY = 0;
+      } else {
+        // Zoom in to 2.5
+        zoomState.scale = 2.5;
+        // Simple center zoom for now, or assume center is target
+        // To be perfect, we should translate so (x,y) becomes center
+        // But (0,0) center-based zoom is standard
+        zoomState.translateX = 0;
+        zoomState.translateY = 0;
+      }
+      applyZoom(true);
+    }
   }
 
   // Close on click outside (only if not dragged)
