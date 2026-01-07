@@ -1165,6 +1165,9 @@ footer {
   transform: scale(0.9);
   transition: transform 0.3s ease;
   display: block;
+  position: relative;
+  z-index: 20;
+  /* Ensure image is above caption */
 }
 
 /* Hide old caption */
@@ -1191,6 +1194,7 @@ footer {
   /* Ensure it doesn't overflow screen width */
   min-width: 200px;
   /* Ensure specific width for very narrow images */
+  z-index: 10;
 }
 
 .image-viewer.visible .viewer-image {
