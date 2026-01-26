@@ -8,7 +8,7 @@ Between 2021 and 2023, I've had substantial end-to-end ownership in the developm
 The camera can operate as:
 - low-power **star tracker**, and optionally enabling detection/tracking/identification of resident space objects (i.e. other satellites or space debris)
 - **angles-only navigation** sensor, combining onboard image processing with Unscented Kalman Filtering, to achieve relative orbit determination (i.e. estimating 6 orbital DoF of an object from a sequence of monocular 2-DoF bearing angle measurements)
-- **6-DoF pose estimation** sensor (i.e. attitude + position) for close proximity operations — except for terminal rendezvous — enabled by FPGA-based acceleration of convolutional neural networks
+- **6-DoF pose estimation** sensor (i.e. attitude + position) for close proximity operations (except for terminal rendezvous) enabled by FPGA-based acceleration of convolutional neural networks
 <figure>
   <img src="img/camera_and_LRF_assembled.jpg" alt="camera and LRF" style="width:85%" width="1920" height="1244">
   <figcaption>

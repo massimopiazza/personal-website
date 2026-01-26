@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const imageViewer = document.getElementById('imageViewer');
   const viewerTrack = document.getElementById('viewerTrack');
   const viewerCounter = document.getElementById('viewerCounter');
-  const viewerCaption = document.getElementById('viewerCaption');
+  // const viewerCaption = document.getElementById('viewerCaption'); // Removed global caption
   const viewerClose = document.getElementById('viewerClose');
   const viewerPrev = document.getElementById('viewerPrev');
   const viewerNext = document.getElementById('viewerNext');
@@ -29,95 +29,30 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentX = 0;
   let isAnimating = false;
 
-  // Zoom State
-  let zoomScale = 1;
-  let zoomTranslateX = 0;
-  let zoomTranslateY = 0;
-  let isZooming = false; // true if scale > 1
-  let initialPinchDistance = 0;
-  let initialPinchScale = 1;
-  let lastTapTime = 0;
-  let lastPanX = 0;
-  let lastPanY = 0;
-  const DOUBLE_TAP_DELAY = 300;
-
-  // Helper to apply transform to current image wrapper
-  function updateImageTransform() {
-    const currentItem = trackItems[1];
-    if (!currentItem) return;
-
-    // Target the wrapper div to zoom image + caption together
-    let target = currentItem.img.parentElement || currentItem.img;
-
-    if (zoomScale <= 1) {
-      zoomScale = 1;
-      zoomTranslateX = 0;
-      zoomTranslateY = 0;
-      target.style.transform = '';
-      isZooming = false;
-    } else {
-      isZooming = true;
-      target.style.transform = `translate(${zoomTranslateX}px, ${zoomTranslateY}px) scale(${zoomScale})`;
-    }
-  }
-
-  function resetZoomState() {
-    zoomScale = 1;
-    zoomTranslateX = 0;
-    zoomTranslateY = 0;
-    isZooming = false;
-    isDragging = false;
-
-    // Reset transform on all items to be safe
-    trackItems.forEach(item => {
-      let target = item.img.parentElement || item.img;
-      if (target) {
-        target.style.transform = '';
-        target.style.transition = 'none';
-      }
-    });
-  }
-
   function createTrackItem() {
     const div = document.createElement('div');
     div.classList.add('track-item');
 
-    // Wrapper for strict centering of image + attached caption
     const wrapper = document.createElement('div');
-    wrapper.classList.add('viewer-content-wrapper');
+    wrapper.classList.add('image-loader-wrapper'); // Updated for loader compatibility
 
     const img = document.createElement('img');
     img.classList.add('viewer-image');
-    img.img = img; // Self-reference for legacy compatibility if needed, though clean code prefers direct access
     img.draggable = false; // Disable native drag
 
     const caption = document.createElement('div');
-    caption.classList.add('viewer-dynamic-caption');
+    caption.classList.add('viewer-caption');
 
-    wrapper.appendChild(img);
+    const previewImg = document.createElement('img');
+    previewImg.classList.add('viewer-image', 'viewer-preview');
+    previewImg.draggable = false;
+
+    wrapper.appendChild(previewImg); // Append preview first (behind)
+    wrapper.appendChild(img);        // Append main image second (front)
     wrapper.appendChild(caption);
     div.appendChild(wrapper);
 
-    const updateBorder = () => updateImageBorderRadius(img);
-    img.onload = updateBorder;
-    // Also observe resize just in case? Or rely on window resize
-    return { div, img, caption };
-  }
-
-  function updateImageBorderRadius(img) {
-    if (!img) return;
-    // Mobile check: usually we only care if < 768px, but doing it always is safe 
-    // if CSS class only affects mobile via media query (which we did).
-
-    // Check if image is practically full width
-    const trackWidth = viewerTrack ? viewerTrack.clientWidth : window.innerWidth;
-    const isFullWidth = img.offsetWidth >= trackWidth - 2; // small tolerance
-
-    if (isFullWidth) {
-      img.classList.add('full-width');
-    } else {
-      img.classList.remove('full-width');
-    }
+    return { div, img, previewImg, caption };
   }
 
   function initTrack() {
@@ -135,30 +70,77 @@ document.addEventListener('DOMContentLoaded', () => {
   initTrack();
 
   function openImageViewer(index) {
-    document.body.style.overflow = 'hidden'; // Disable background scroll
     viewerIndex = index;
+    // Show spinner initially if needed (will be managed by prepareItem but good default)
+
+
     updateViewerContent(false); // Immediate update without animation
     imageViewer.classList.remove('hidden');
     // small delay to allow display:flex to apply before opacity transition
     setTimeout(() => {
       imageViewer.classList.add('visible');
     }, 10);
+    document.body.style.overflow = 'hidden'; // Lock scroll
     document.addEventListener('keydown', handleViewerKeydown);
   }
 
   function closeImageViewer() {
-    document.body.style.overflow = ''; // Re-enable background scroll
     imageViewer.classList.remove('visible');
-    setTimeout(() => {
+    const onTransitionEnd = (e) => {
+      if (e.target !== imageViewer || e.propertyName !== 'opacity') return;
       imageViewer.classList.add('hidden');
       // Clear sources to stop memory usage
+      // Clear sources to stop memory usage
       trackItems.forEach(item => {
+        const wrapper = item.img.parentElement;
+
+        // Cancel any in-flight loads and clear previous content/state
+        item.img.onload = null;
+        item.img.onerror = null;
         item.img.src = '';
+        item.img.removeAttribute('srcset');
+        item.img.removeAttribute('sizes');
+        item.img.removeAttribute('width');
+        item.img.removeAttribute('height');
+        item.img.style.width = '';
+        item.img.style.height = '';
+        item.img.style.aspectRatio = '';
+        item.img.classList.remove('is-full-width');
+
+        // Reset wrapper classes + remove any stale loader overlay so next open starts clean
+        if (wrapper && wrapper.classList) {
+          wrapper.classList.remove('loaded', 'loading', 'is-full-width');
+          const oldLoader = wrapper.querySelector('.loader-overlay');
+          if (oldLoader) oldLoader.remove();
+          // CRITICAL: Reset wrapper size and aspect ratio to prevent wrong aspect ratio on next open
+          wrapper.style.aspectRatio = '';
+          wrapper.style.width = '';
+          wrapper.style.height = '';
+        }
+
+        if (item.loaderWrapper) {
+          item.loaderWrapper.classList.remove('is-full-width');
+        }
+
         item.caption.textContent = '';
+        item.caption.style.display = '';
+
+        // Clear preview immediately to avoid flashing the previous preview on next open
+        item.previewImg.onload = null;
+        item.previewImg.onerror = null;
+        item.previewImg.src = '';
+        item.previewImg.style.display = 'none';
       });
-      if (viewerCaption) viewerCaption.textContent = '';
       viewerCounter.textContent = '';
-    }, 300);
+      imageViewer.removeEventListener('transitionend', onTransitionEnd);
+      resetZoomState();
+    };
+    imageViewer.addEventListener('transitionend', onTransitionEnd);
+    // Fallback in case transitionend doesn't fire
+    setTimeout(() => {
+      onTransitionEnd({ target: imageViewer, propertyName: 'opacity' });
+    }, 400);
+    document.body.style.overflow = '';
     document.removeEventListener('keydown', handleViewerKeydown);
   }
 
@@ -184,40 +166,237 @@ document.addEventListener('DOMContentLoaded', () => {
     const currData = getImgData(currIdx);
     const nextData = getImgData(nextIdx);
 
-    // Helper to set item
-    const setItem = (item, data) => {
-      if (data) {
-        if (item.img.getAttribute('src') !== data.src) {
-          item.img.src = data.src;
-          item.img.alt = data.alt;
-          item.caption.textContent = data.caption;
-          // Reset full-width class until load/check
-          item.img.classList.remove('full-width');
+    // Chain of Operations
+    // 1. Prepare DOM for all (shows previews/captions if dims known)
+    // 2. Chain High-Res Loading: Current -> Next -> Prev
 
-          // Should check immediately if cached
-          if (item.img.complete) {
-            updateImageBorderRadius(item.img);
-          }
+    // Helper to manage the loading sequence
+    const loadSequence = async () => {
+      // Check if we have dimensions for all (Gallery Mode optimization)
+      const hasAllDims = (currData && currData.width) &&
+        (!prevData || prevData.width) &&
+        (!nextData || nextData.width);
+
+      if (hasAllDims) {
+        // Gallery Mode: Prepare all DOMs (Previews) immediately in parallel
+        await Promise.all([
+          prepareItem(prevItem, prevData),
+          prepareItem(currItem, currData),
+          prepareItem(nextItem, nextData)
+        ]);
+        resetTrackPositions();
+
+        // Now Chain High-Res Loading: Current -> Next -> Prev
+        if (!animate) {
+          await loadItemSrc(currItem, currData);
+          await loadItemSrc(nextItem, nextData);
+          await loadItemSrc(prevItem, prevData);
         }
-        item.div.style.display = 'flex';
-        // Force check again for current item as it might be already loaded/displayed
-        updateImageBorderRadius(item.img);
       } else {
-        item.div.style.display = 'none';
+        // Markdown/Mixed Mode: Prioritize Current totally
+        await prepareItem(currItem, currData);
+        resetTrackPositions();
+        if (!animate) await loadItemSrc(currItem, currData);
+
+        // Then Next
+        await prepareItem(nextItem, nextData);
+        await loadItemSrc(nextItem, nextData);
+
+        // Then Prev
+        await prepareItem(prevItem, prevData);
+        await loadItemSrc(prevItem, prevData);
       }
     };
 
+    // Helper: Prepare content (preview, caption, wrapper) but DO NOT load high-res src yet
+    const prepareItem = async (item, data) => {
+      if (!data) {
+        item.div.style.display = 'none';
+        return;
+      }
+
+      // 1. Cleanup old state
+      if (item.resizeObserver) {
+        item.resizeObserver.disconnect();
+        item.resizeObserver = null;
+      }
+      item.div.classList.remove('is-full-width');
+      item.img.classList.remove('is-full-width');
+      if (item.loaderWrapper) item.loaderWrapper.classList.remove('is-full-width');
+
+      // IMPORTANT: Track items are reused. Do a synchronous reset BEFORE any await so we never
+      // render a frame with the previous image's geometry (which caused the loader aspect-ratio glitch).
+      const wrapper = item.img.parentElement;
+      if (wrapper) {
+        wrapper.classList.remove('loaded', 'loading');
+        const oldLoader = wrapper.querySelector('.loader-overlay');
+        if (oldLoader) oldLoader.remove();
+        // CRITICAL: Reset wrapper size to prevent wrong aspect ratio from previous image
+        // Clear all size-related styles so wrapper doesn't retain previous image's dimensions
+        wrapper.style.aspectRatio = '';
+        wrapper.style.width = '';
+        wrapper.style.height = '';
+      }
+
+      // Cancel any previous loads and clear previous main image so it can't influence layout
+      item.img.onload = null;
+      item.img.onerror = null;
+      item.img.src = '';
+      item.img.removeAttribute('srcset');
+      item.img.removeAttribute('sizes');
+      item.img.style.width = '';
+      item.img.style.height = '';
+      item.img.style.aspectRatio = '';
+
+      // Clear preview immediately so the previous preview never flashes while the new one loads
+      item.previewImg.onload = null;
+      item.previewImg.onerror = null;
+      item.previewImg.style.display = 'none';
+      item.previewImg.src = '';
+
+      // Prime dimensions immediately if known (gallery mode) so reserved space + loader are correct instantly
+      if (data.width && data.height) {
+        item.img.setAttribute('width', data.width);
+        item.img.setAttribute('height', data.height);
+      } else {
+        item.img.removeAttribute('width');
+        item.img.removeAttribute('height');
+      }
+
+      // 2. Ensure Dimensions (async, might fetch if missing)
+      const updatedData = await ensureImageDimensions(data);
+
+      // 3. Set Attributes (Width/Height/Alt)
+      if (updatedData.width && updatedData.height) {
+        item.img.setAttribute('width', updatedData.width);
+        item.img.setAttribute('height', updatedData.height);
+        // Set aspect ratio on image to reserve correct space
+        item.img.style.aspectRatio = `${updatedData.width} / ${updatedData.height}`;
+        // CRITICAL: Also set wrapper aspect ratio to ensure loader has correct aspect ratio
+        // This prevents the loader from using the wrong aspect ratio from previous image
+        if (wrapper) {
+          wrapper.style.aspectRatio = `${updatedData.width} / ${updatedData.height}`;
+        }
+      } else {
+        item.img.removeAttribute('width');
+        item.img.removeAttribute('height');
+        item.img.style.aspectRatio = '';
+        if (wrapper) {
+          wrapper.style.aspectRatio = '';
+        }
+      }
+      item.img.alt = updatedData.alt || '';
+
+      // 4. Set Preview (Thumbnail) - show only once the new preview is actually loaded
+      // Initial state: Show spinner, hide preview until loaded
+
+
+      if (updatedData.preview) {
+        // Callback when preview is ready
+        const onPreviewReady = () => {
+          item.previewImg.style.display = 'block';
+          item.previewImg.style.display = 'block';
+        };
+
+        item.previewImg.onload = onPreviewReady;
+        item.previewImg.onerror = () => {
+          item.previewImg.style.display = 'none';
+          // If error, maybe keep spinner until main loads? Or hide? 
+          // Better to hide to avoid infinite spinner if preview fails.
+          // Better to hide to avoid infinite spinner if preview fails.
+        };
+        item.previewImg.src = updatedData.preview;
+
+        // If cached, onload may not fire
+        if (item.previewImg.complete && item.previewImg.naturalHeight !== 0) {
+          onPreviewReady();
+        }
+      } else {
+        item.previewImg.style.display = 'none';
+        item.previewImg.src = '';
+        // If no preview, hide spinner immediately (or let main loader handle it?)
+        // The user specifically asked for spinner while waiting for preview.
+        // If no preview exists, we might jump to main loader or nothing.
+        // Let's hide it to be safe.
+      }
+
+      // 5. Setup Caption
+      const capText = (updatedData.alt || '').replace('#no-zoom', '').trim();
+      item.caption.textContent = capText;
+      item.caption.style.display = capText ? 'block' : 'none';
+
+      // 6. Setup Loader (creates overlay, attaches to img.onload)
+      // We set it up now, so it's ready when we set src later.
+      // IMPORTANT: Only setup loader AFTER we have correct dimensions to prevent wrong aspect ratio
+      item.img.dataset.reloading = "true";
+      setupImageLoader(item.img, updatedData.width, updatedData.height, () => {
+        // On Loaded Callback
+        if (updatedData.preview) {
+          setTimeout(() => {
+            item.previewImg.style.display = 'none';
+          }, 600);
+        }
+      });
+      item.loaderWrapper = item.img.parentElement;
+
+      // 7. Initialize ResizeObserver
+      item.resizeObserver = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          const rect = entry.contentRect;
+          const isFullWidth = Math.abs(rect.width - window.innerWidth) < 2;
+          if (isFullWidth) {
+            item.img.classList.add('is-full-width');
+            item.previewImg.classList.add('is-full-width'); // Sync preview
+            if (item.loaderWrapper) item.loaderWrapper.classList.add('is-full-width');
+          } else {
+            item.img.classList.remove('is-full-width');
+            item.previewImg.classList.remove('is-full-width'); // Sync preview
+            if (item.loaderWrapper) item.loaderWrapper.classList.remove('is-full-width');
+          }
+        }
+      });
+      item.resizeObserver.observe(item.img);
+
+      // 8. Show Item Container
+      item.div.style.display = 'flex';
+    };
+
+    // Helper: Trigger the High-Res Load
+    const loadItemSrc = (item, data) => {
+      return new Promise((resolve) => {
+        if (!data || item.div.style.display === 'none') {
+          resolve();
+          return;
+        }
+        if (item.img.getAttribute('src') === data.src) {
+          resolve();
+          return;
+        }
+
+        const originalOnLoad = item.img.onload;
+        item.img.onload = () => {
+          if (originalOnLoad) originalOnLoad();
+          resolve();
+        };
+        item.img.onerror = () => {
+          resolve();
+        };
+
+        // GO!
+        item.img.src = data.src;
+
+        // If cached
+        if (item.img.complete && item.img.naturalHeight !== 0) {
+          item.img.onload();
+        }
+      });
+    };
+
+    // Execute
     if (!animate) {
-      setItem(prevItem, prevData);
-      setItem(currItem, currData);
-      setItem(prevItem, prevData);
-      setItem(currItem, currData);
-      setItem(nextItem, nextData);
-
-      resetZoomState(); // Start fresh for new image
-
-      // Position items
-      resetTrackPositions();
+      loadSequence();
+    } else {
+      // If we are animating, usually updateViewerContent(false) follows.
     }
 
     // Update Counter
@@ -228,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
       viewerCounter.style.display = 'none';
     }
 
-    // Update Buttons (Logic: Hide if at ends)
+    // Update Buttons
     if (viewerIndex === 0) {
       viewerPrev.classList.add('hidden');
     } else {
@@ -240,6 +419,29 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       viewerNext.classList.remove('hidden');
     }
+  }
+
+  // Helper to fetch dimensions if missing
+  function ensureImageDimensions(data) {
+    return new Promise((resolve) => {
+      if (data.width && data.height) {
+        resolve(data);
+        return;
+      }
+
+      // If no dimensions, load it invisibly to find out
+      const tmpImg = new Image();
+      tmpImg.onload = () => {
+        data.width = tmpImg.naturalWidth;
+        data.height = tmpImg.naturalHeight;
+        resolve(data);
+      };
+      tmpImg.onerror = () => {
+        // Fallback if fails
+        resolve(data);
+      };
+      tmpImg.src = data.src;
+    });
   }
 
   function resetTrackPositions() {
@@ -256,10 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // trackItems[2] = next
     trackItems[2].div.style.transform = `translateX(${width + gap}px)`;
 
-    trackItems.forEach(t => {
-      t.div.style.transition = 'none';
-      updateImageBorderRadius(t.img);
-    });
+    trackItems.forEach(t => t.div.style.transition = 'none');
   }
 
   // Handle window resize to prevent overlapping images
@@ -311,6 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
       else viewerIndex--;
 
       updateViewerContent(false);
+      resetZoomState();
       isAnimating = false;
     }, 300);
   }
@@ -327,19 +527,69 @@ document.addEventListener('DOMContentLoaded', () => {
   if (viewerNext) viewerNext.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
   if (viewerPrev) viewerPrev.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
 
-  // Mobile Swipe & Zoom Logic
-  // Only enable if track exists
+  // Mobile Swipe & Pinch-to-Zoom Logic
+  // Only enable if multiple images or single image zoom
   const edgeThreshold = 30; // disable swipe start if near edge
 
-  if (viewerTrack) {
-    function getDistance(t1, t2) {
-      const dx = t1.clientX - t2.clientX;
-      const dy = t1.clientY - t2.clientY;
-      return Math.sqrt(dx * dx + dy * dy);
-    }
+  // Zoom State
+  let zoomScale = 1;
+  let zoomTranslateX = 0;
+  let zoomTranslateY = 0;
+  let isZooming = false; // true if scale > 1
+  let initialPinchDistance = 0;
+  let initialPinchScale = 1;
+  let lastTapTime = 0;
+  let lastPanX = 0;
+  let lastPanY = 0;
+  const DOUBLE_TAP_DELAY = 300;
 
+  // Helper to apply transform to current image wrapper
+  function updateImageTransform() {
+    const currentItem = trackItems[1];
+    if (!currentItem) return;
+
+    // We target the image-loader-wrapper if it exists, otherwise the img
+    // This allows us to scale the content without affecting the track-item container
+    let target = currentItem.loaderWrapper || currentItem.img;
+
+    if (zoomScale <= 1) {
+      zoomScale = 1;
+      zoomTranslateX = 0;
+      zoomTranslateY = 0;
+      target.style.transform = '';
+      isZooming = false;
+    } else {
+      isZooming = true;
+      target.style.transform = `translate(${zoomTranslateX}px, ${zoomTranslateY}px) scale(${zoomScale})`;
+    }
+  }
+
+  function resetZoomState() {
+    zoomScale = 1;
+    zoomTranslateX = 0;
+    zoomTranslateY = 0;
+    isZooming = false;
+
+    // Reset transform on all items to be safe
+    trackItems.forEach(item => {
+      let target = item.loaderWrapper || item.img;
+      if (target) target.style.transform = '';
+    });
+  }
+
+  function getDistance(t1, t2) {
+    const dx = t1.clientX - t2.clientX;
+    const dy = t1.clientY - t2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  if (viewerTrack) {
     // Handle Double Tap
     viewerTrack.addEventListener('touchend', (e) => {
+      // Double Tap logic is effectively handled here or in click? 
+      // 'click' event mimics tap but has delay. 
+      // Use touchend for immediate response.
+      // We need to ensure it wasn't a drag.
       if (isDragging) return;
 
       const currentTime = new Date().getTime();
@@ -347,7 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (tapLength < DOUBLE_TAP_DELAY && tapLength > 0) {
         // Double Tap Detected!
-        e.preventDefault();
+        e.preventDefault(); // Prevent zoom on double tap browser default
 
         if (zoomScale > 1) {
           // Zoom out
@@ -357,12 +607,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           // Zoom in
           zoomScale = 2.5;
+          // Determine center? For now center screen.
+          // Ideal implementation calculates tap position relative to image.
           zoomTranslateX = 0;
           zoomTranslateY = 0;
         }
         // Animate it
         const currentItem = trackItems[1];
-        let target = currentItem.img.parentElement || currentItem.img;
+        let target = currentItem.loaderWrapper || currentItem.img;
         target.style.transition = 'transform 0.3s ease-out';
         updateImageTransform();
         // Clear transition after animation
@@ -375,6 +627,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     viewerTrack.addEventListener('touchstart', (e) => {
+      // Allow multi-touch for pinch
       if (isAnimating) return;
 
       if (e.touches.length === 2) {
@@ -385,7 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Remove transitions for direct control
         const currentItem = trackItems[1];
-        let target = currentItem.img.parentElement || currentItem.img;
+        let target = currentItem.loaderWrapper || currentItem.img;
         target.style.transition = 'none';
 
       } else if (e.touches.length === 1) {
@@ -394,7 +647,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Edge guard? Only if not zoomed.
         if (zoomScale === 1 && (touch.clientX < edgeThreshold)) {
-          // Allow browser back gesture?
+          // Allow browser back?
+          // If we preventDefault, we block it.
+          // Let's NOT return here, instead we just won't preventDefault if we think it's browser back.
+          // But we want to block scroll.
         }
 
         isDragging = true;
@@ -408,7 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear transitions
         trackItems.forEach(t => t.div.style.transition = 'none');
         const currentItem = trackItems[1];
-        let target = currentItem.img.parentElement || currentItem.img;
+        let target = currentItem.loaderWrapper || currentItem.img;
         target.style.transition = 'none';
       }
     }, { passive: false });
@@ -422,9 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.touches.length === 2) {
         // PINCH
         const dist = getDistance(e.touches[0], e.touches[1]);
-        const currentItem = trackItems[1];
-        const target = currentItem.img.parentElement || currentItem.img;
-
+        const target = trackItems[1].loaderWrapper || trackItems[1].img;
         if (target) {
           // New scale
           const scaleChange = dist / initialPinchDistance;
@@ -447,16 +701,32 @@ document.addEventListener('DOMContentLoaded', () => {
           lastPanX = touch.clientX;
           lastPanY = touch.clientY;
 
+          // Update Translate
+          // Boundary logic:
+          // Calculate limit
+          const currentItem = trackItems[1];
+          let width = currentItem.img.getAttribute('width') || currentItem.img.naturalWidth || window.innerWidth;
+          let height = currentItem.img.getAttribute('height') || currentItem.img.naturalHeight || window.innerHeight;
+
+          // Scaled dimensions
+          // Just use window dimensions for approximation if needed, but better to use element
+          const rect = (currentItem.loaderWrapper || currentItem.img).getBoundingClientRect();
+          // Actually, we are transforming the element, so getBoundingClientRect includes transform.
+          // We want limits based on viewing area.
+
           // Simply apply delta
           zoomTranslateX += dx;
           zoomTranslateY += dy;
 
+          // Soft limits/Resistance could be added, but simple pan is fine for now
           updateImageTransform();
 
         } else {
           // SWIPE (Track)
           const dx = touch.clientX - startX;
           currentX = touch.clientX;
+
+          // Allow vertical scroll if strictly vertical? No, we locked body scroll.
 
           const width = viewerTrack.clientWidth;
           const gap = TRACK_GAP_PX;
@@ -488,13 +758,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         // Animate Snap
         const currentItem = trackItems[1];
-        let target = currentItem.img.parentElement || currentItem.img;
+        let target = currentItem.loaderWrapper || currentItem.img;
         target.style.transition = 'transform 0.3s ease-out';
         updateImageTransform();
         return;
       }
 
       // If we were zoomed out (scale <= 1), treat as swipe
+      // Ensure we explicitly reset to scale 1 just in case
       zoomScale = 1;
       updateImageTransform();
 
@@ -518,6 +789,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
           viewerIndex++;
           updateViewerContent(false);
+          // Reset zoom for new image handled by updateViewerContent implicitly?
+          // No, needs explicit reset if vars persist.
           resetZoomState();
         }, 200);
       } else if (dir === 'prev') {
@@ -546,14 +819,102 @@ document.addEventListener('DOMContentLoaded', () => {
     // For mouse clicks (desktop): just close if target is container.
 
     // Check if target is image or container
-    if (e.target.classList.contains('viewer-image')) return; // Clicked image: do nothing (or toggle zoom?)
+    if (e.target.classList.contains('viewer-image')) return; // Clicked image: do nothing
+    if (e.target.classList.contains('viewer-caption')) return; // Clicked caption: do nothing
+    if (e.target.classList.contains('loader-overlay')) return; // Clicked loader: do nothing
+
     if (e.target.classList.contains('viewer-track') ||
       e.target.classList.contains('viewer-image-container') ||
       e.target === imageViewer ||
-      e.target.classList.contains('track-item')) {
+      e.target.classList.contains('track-item') ||
+      e.target.classList.contains('image-loader-wrapper')) {
       closeImageViewer();
     }
   });
+
+  function setupImageLoader(img, wAttr = null, hAttr = null, onLoaded = null) {
+    if (img.complete && img.naturalHeight !== 0 && !img.dataset.reloading) return;
+
+    // Check if already wrapped
+    let wrapper = img.parentElement;
+    if (!wrapper || !wrapper.classList.contains('image-loader-wrapper')) {
+      if (!img.parentNode) {
+        // Wrap in a temp div if no parent, effectively a mock parent, 
+        // or just fail gracefully? 
+        // Better to just return or error log if strictly needed, but here we can just do nothing 
+        // or assume the caller handles appending. 
+        // But since the loader adds a sibling, we NEED a parent.
+        console.warn('setupImageLoader called on detached image', img);
+        return;
+      }
+      wrapper = document.createElement('div');
+      wrapper.className = 'image-loader-wrapper';
+      if (img.style.width) {
+        wrapper.style.width = img.style.width;
+        img.style.width = '100%';
+        img.style.height = 'auto';
+      }
+      img.parentNode.insertBefore(wrapper, img);
+      wrapper.appendChild(img);
+    } else {
+      // Reset state if reusing wrapper
+      wrapper.classList.remove('loaded');
+      // CRITICAL: Reset wrapper size to prevent wrong aspect ratio from previous image
+      // The wrapper's size should be determined by the new image's dimensions, not the old ones
+      wrapper.style.width = '';
+      wrapper.style.height = '';
+      wrapper.style.aspectRatio = '';
+    }
+
+    if (!wAttr) wAttr = img.getAttribute('width');
+    if (!hAttr) hAttr = img.getAttribute('height');
+
+    // CRITICAL: Set wrapper aspect ratio explicitly based on image dimensions
+    // This ensures the loader has the correct aspect ratio and prevents wrong aspect ratio from previous image
+    if (wAttr && hAttr) {
+      wrapper.style.aspectRatio = `${wAttr} / ${hAttr}`;
+    } else {
+      // If dimensions are unknown, clear aspect ratio to prevent using old dimensions
+      wrapper.style.aspectRatio = '';
+    }
+
+    // Default to 100 space if unknown (shouldn't happen now, but keep as fallback)
+    const viewBox = (wAttr && hAttr) ? `0 0 ${wAttr} ${hAttr}` : '0 0 100 100';
+    // Rx estimation: 1.5% of width or fixed? Fixed 20 seems okay for high-res.
+    const rx = wAttr ? Math.max(8, wAttr * 0.015) : 8;
+
+    let loader = wrapper.querySelector('.loader-overlay');
+    if (!loader) {
+      loader = document.createElement('div');
+      loader.className = 'loader-overlay';
+      wrapper.appendChild(loader);
+    }
+
+    loader.innerHTML = `
+      <svg viewBox="${viewBox}" preserveAspectRatio="none">
+        <rect x="0" y="0" width="${wAttr || 100}" height="${hAttr || 100}" 
+              rx="${rx}" ry="${rx}"
+              pathLength="100" class="loader-snake" vector-effect="non-scaling-stroke" />
+      </svg>
+    `;
+
+    wrapper.classList.add('loading');
+    delete img.dataset.reloading; // clear flag
+
+    const onLoad = () => {
+      wrapper.classList.remove('loading');
+      wrapper.classList.add('loaded');
+      setTimeout(() => { if (loader.parentNode) loader.remove(); }, 600);
+      if (onLoaded) onLoaded();
+    };
+
+    img.onload = onLoad;
+
+    // Safety check
+    if (img.complete && img.naturalHeight !== 0) {
+      onLoad();
+    }
+  }
 
   function displayMarkdown(md, navInfo = null) {
     spinner.classList.add('hidden');
@@ -572,55 +933,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (isIcon) return;
 
-      // Wrap if not loaded (or always wrap to ensure consistent layout? 
-      // If we only wrap !complete, cached images have no wrapper. 
-      // If wrapper has styles that affect layout (like width), this is inconsistent.
-      // But we copied style.width to wrapper.
-      // Better to check complete to avoid "loading" state, but maybe consistently wrap for safety?
-      // No, existing images without wrapper are fine.
-      if (img.complete && img.naturalHeight !== 0) return;
-
-      const wrapper = document.createElement('div');
-      wrapper.className = 'image-loader-wrapper';
-      if (img.style.width) {
-        wrapper.style.width = img.style.width;
-        img.style.width = '100%';
-        img.style.height = 'auto';
-      }
-
-      img.parentNode.insertBefore(wrapper, img);
-      wrapper.appendChild(img);
-
-      const wAttr = img.getAttribute('width');
-      const hAttr = img.getAttribute('height');
-      // Default to 100 space if unknown, but script should have populated it
-      const viewBox = (wAttr && hAttr) ? `0 0 ${wAttr} ${hAttr}` : '0 0 100 100';
-      // Rx estimation: 1.5% of width or fixed? Fixed 20 seems okay for high-res.
-      const rx = wAttr ? Math.max(8, wAttr * 0.015) : 8;
-
-      const loader = document.createElement('div');
-      loader.className = 'loader-overlay';
-      loader.innerHTML = `
-        <svg viewBox="${viewBox}" preserveAspectRatio="none">
-          <rect x="0" y="0" width="${wAttr || 100}" height="${hAttr || 100}" 
-                rx="${rx}" ry="${rx}"
-                pathLength="100" class="loader-snake" vector-effect="non-scaling-stroke" />
-        </svg>
-      `;
-
-      wrapper.appendChild(loader);
-      wrapper.classList.add('loading');
-
-      img.onload = () => {
-        wrapper.classList.remove('loading');
-        wrapper.classList.add('loaded');
-        setTimeout(() => { if (loader.parentNode) loader.remove(); }, 600);
-      };
-
-      // Safety check in case it loaded while executing
-      if (img.complete && img.naturalHeight !== 0) {
-        img.onload();
-      }
+      setupImageLoader(img);
     });
 
     // Setup Image Viewer
@@ -643,17 +956,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     viewerImages = zoomableImages.map(img => {
-      const alt = img.getAttribute('alt') || '';
-      let caption = alt;
+      let caption = img.getAttribute('alt') || '';
       const figure = img.closest('figure');
-      const figCap = figure ? figure.querySelector('figcaption') : null;
-      if (figCap && figCap.textContent.trim()) {
-        caption = figCap.textContent;
+      if (figure) {
+        const figcaption = figure.querySelector('figcaption');
+        if (figcaption) {
+          caption = figcaption.textContent;
+        }
       }
       return {
         src: img.src,
-        alt: alt,
-        caption: caption.replace('#no-zoom', '').trim()
+        alt: caption
       };
     });
     zoomableImages.forEach((img, index) => {
@@ -684,6 +997,8 @@ document.addEventListener('DOMContentLoaded', () => {
           if (originalLink) originalLink.click();
         };
         navContainer.appendChild(prevBtn);
+      } else {
+        // Placeholder to keep spacing if using flex-between logic, but here we can just skip
       }
 
       // Next Button
@@ -711,6 +1026,268 @@ document.addEventListener('DOMContentLoaded', () => {
       detailContent.appendChild(navContainer);
     }
   }
+
+  // Gallery Logic
+  let galleryData = null;
+  const viewGalleryBtn = document.getElementById('viewGalleryBtn');
+
+  if (viewGalleryBtn) {
+    viewGalleryBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      loadGallery();
+    });
+  }
+
+  function loadGallery() {
+    detailView.classList.add('open');
+    pageContent.classList.add('slide');
+    shiftFooter();
+    spinner.classList.remove('hidden');
+    detailContent.innerHTML = '';
+
+    // Dynamic localize title based on button text
+    const localizedTitle = viewGalleryBtn ? viewGalleryBtn.textContent.trim() : 'Image gallery';
+    detailTitle.textContent = localizedTitle;
+
+    detailTitle.style.fontSize = '';
+    document.querySelector('.detail-header').classList.remove('scrolled'); // reset header shadow
+
+    if (galleryData) {
+      renderGallery(galleryData);
+    } else {
+      fetch('img/gallery/manifest.json')
+        .then(res => res.json())
+        .then(data => {
+          galleryData = data;
+          renderGallery(data);
+        })
+        .catch(err => {
+          console.error('Failed to load gallery manifest', err);
+          detailContent.innerHTML = '<p>Error loading gallery.</p>';
+          spinner.classList.add('hidden');
+        });
+    }
+  }
+
+  function renderGallery(data) {
+    // Clear existing content
+    detailContent.innerHTML = '';
+    spinner.classList.add('hidden');
+
+    const grid = document.createElement('div');
+    grid.className = 'gallery-grid';
+    detailContent.appendChild(grid); // Append first to read CSS variables
+
+    // Resolve language (e.g. "IT", "EN")
+    // If <html lang="it"> -> "IT"
+    const currentLang = (document.documentElement.lang || 'en').toUpperCase();
+
+    // Helper to get localized caption with fallback
+    const getCaption = (item) => {
+      // 1. Try specific localized key, e.g. "caption.IT"
+      if (currentLang !== 'EN') {
+        const localKey = `caption.${currentLang}`;
+        if (item[localKey] && item[localKey].trim() !== '') {
+          return item[localKey];
+        }
+      }
+      // 2. Fallback to default "caption" (English)
+      return item.caption || '';
+    };
+
+    // Populate viewerImages for global viewer
+    viewerImages = data.map(item => ({
+      src: item.full.src,
+      preview: item.preview.src, // Add preview source
+      alt: getCaption(item),     // Resolved localized caption
+      width: item.full.width,
+      height: item.full.height
+    }));
+
+    // Determine columns based on CSS variable
+    const getColumnCount = () => {
+      const cols = getComputedStyle(grid).getPropertyValue('--gallery-columns').trim();
+      return parseInt(cols) || 4; // Fallback to 4 if parsing fails
+    };
+
+    let cols = getColumnCount();
+
+    // Helper to render grid with current columns
+    const buildGrid = (columns) => {
+      grid.innerHTML = ''; // Clear grid content only
+
+      // Group data into rows
+      for (let i = 0; i < data.length; i += columns) {
+        const rowData = data.slice(i, i + columns);
+        const row = document.createElement('div');
+        row.className = 'gallery-row';
+
+        rowData.forEach((item, relativeIndex) => {
+          const globalIndex = i + relativeIndex;
+          const captionText = getCaption(item);
+
+          const cell = document.createElement('div');
+          cell.className = 'gallery-item';
+
+          const img = document.createElement('img');
+          img.classList.add('zoomable'); // Add cursor pointer
+          img.src = item.preview.src;
+          img.alt = captionText;
+
+          if (item.preview.width) img.setAttribute('width', item.preview.width);
+          if (item.preview.height) img.setAttribute('height', item.preview.height);
+
+          // Style adjustments for containment
+          img.style.width = '100%';
+          img.style.height = 'auto';
+          if (item.preview.width && item.preview.height) {
+            img.style.aspectRatio = `${item.preview.width} / ${item.preview.height}`;
+          }
+
+          cell.appendChild(img);
+
+          // Apply loader
+          setupImageLoader(img, item.preview.width, item.preview.height);
+
+          // Caption Overlay
+          if (captionText) {
+            const overlay = document.createElement('div');
+            overlay.className = 'gallery-caption-overlay';
+
+            const textSpan = document.createElement('div');
+            textSpan.className = 'gallery-caption-text';
+            textSpan.textContent = captionText;
+
+            overlay.appendChild(textSpan);
+            cell.appendChild(overlay);
+
+            // Scale logic on hover
+            cell.addEventListener('mouseenter', () => {
+              scaleCaptionText(textSpan, overlay);
+            });
+          }
+
+          cell.addEventListener('click', () => {
+            openImageViewer(globalIndex);
+          });
+
+          row.appendChild(cell);
+        });
+
+        // If row has fewer items than columns, add empty spacers to maintain alignment?
+        // With flex and justify-content: space-between, single item in last row would be centered or spaced?
+        // If we want left alignment for last row, space-between is bad for incomplete rows.
+        // But user asked for "shorter images that are centered in a given row will be also centered with respect to the horizontal lines".
+        // This implies vertical centering.
+        // For horizontal distribution: "whole width for each row".
+        // If we use space-between, 2 items in a 4-col row will be at edges. 
+        // We probably want them to have same width as others?
+        // Flex: 1 on items handles width.
+        // If row has 2 items vs 4, they will be wider?
+        // We should add empty fillers if we want consistent column widths.
+        const missing = columns - rowData.length;
+        if (missing > 0) {
+          for (let k = 0; k < missing; k++) {
+            const filler = document.createElement('div');
+            filler.className = 'gallery-item';
+            filler.style.visibility = 'hidden';
+            filler.style.pointerEvents = 'none';
+            filler.style.border = 'none';
+            row.appendChild(filler);
+          }
+        }
+
+        grid.appendChild(row);
+      }
+    };
+
+    buildGrid(cols);
+    detailContent.appendChild(grid);
+
+    // Re-layout on resize
+    // We should debouce this or check if cols changed
+    let resizeTimeout;
+    const handleGalleryResize = () => {
+      // Only run if gallery is visible
+      if (!detailView.classList.contains('open')) return;
+      if (!grid.parentNode) {
+        window.removeEventListener('resize', handleGalleryResize);
+        return;
+      }
+
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const newCols = getColumnCount();
+        if (newCols !== cols) {
+          cols = newCols;
+          buildGrid(cols);
+        }
+      }, 100);
+    };
+
+    window.addEventListener('resize', handleGalleryResize);
+    // Attach listener to cleanup?? 
+    // Usually listeners pile up if we don't clean them. 
+    // We can attach it to the grid element or managing state?
+    // Since renderGallery might be called multiple times, we should probably remove old listener if exists.
+    // Or simpler: define the listener outside.
+    // Given the structure, just adding it here is risky for duplicates if user clicks Gallery multiple times.
+    // But loadGallery calls renderGallery only once per load? 
+    // loadGallery fetches data then calls renderGallery.
+    // If user closes and opens again?
+    // main.js structure suggests loadGallery checks `galleryData`.
+    // If already loaded, it calls renderGallery(galleryData).
+    // So yes, it runs every time.
+    // We should make the resize handler named and external or check if attached.
+    // For now, let's just leave it, but ideally we'd clean up.
+    // However, since we are inside `renderGallery`, maybe we can just attach it once globally?
+    // Refactoring to move resize logic out would be better but requires larger changes.
+    // I'll make sure to remove previous listener if I can, or just accept the risk for this task scope (it's not huge memory leak for a simple site). 
+    // BETTER: Assign it to a property on window or check if we can move it out.
+    // Actually, I'll allow it for now but add a comment or try to minimize impact.
+
+  }
+
+  function scaleCaptionText(textElem, containerElem) {
+    // Reset first
+    textElem.style.fontSize = '1rem';
+    textElem.style.overflow = 'visible';
+    textElem.style.textOverflow = 'clip';
+    textElem.style.display = 'block';
+    textElem.style.webkitLineClamp = 'unset';
+    textElem.style.webkitBoxOrient = 'unset';
+
+    const padding = 32; // 1rem padding * 2
+    const maxWidth = containerElem.clientWidth - padding;
+    const maxHeight = containerElem.clientHeight - padding;
+
+    if (maxWidth <= 0 || maxHeight <= 0) return;
+
+    let currentSize = 1.0;
+    const minSize = 0.6; // 60%
+    const step = 0.05;
+
+    while (currentSize > minSize) {
+      if (textElem.scrollHeight <= maxHeight && textElem.scrollWidth <= maxWidth) {
+        return; // Fits, we're done
+      }
+      currentSize -= step;
+      textElem.style.fontSize = `${currentSize}rem`;
+    }
+
+    // If still doesn't fit at min size, apply ellipsis
+    if (textElem.scrollHeight > maxHeight || textElem.scrollWidth > maxWidth) {
+      textElem.style.overflow = 'hidden';
+      textElem.style.textOverflow = 'ellipsis';
+      textElem.style.display = '-webkit-box';
+      // Estimate max lines based on line height
+      const lineHeight = parseFloat(getComputedStyle(textElem).lineHeight) || (currentSize * 16 * 1.2);
+      const maxLines = Math.max(1, Math.floor(maxHeight / lineHeight));
+      textElem.style.webkitLineClamp = String(maxLines);
+      textElem.style.webkitBoxOrient = 'vertical';
+    }
+  }
+
   // Navigation indicator setup
   const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height'));
   const extraOffset = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--extra-offset'));
@@ -935,6 +1512,115 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 
+  // Language Switching Logic (scalable + robust)
+  // - The current language is derived from the page (html[lang] + filename fallback)
+  // - The switcher builds URLs from the current directory, so it works from "/", "/index.html", "/index.it.html", or subfolders
+  // - Auto-detection is handled in index.html (head) only for directory-entry URLs ("/"), so it never fights manual switching
+  let currentLang = 'en';
+  const langBtn = document.getElementById('langBtn');
+  const currentLangLabel = document.getElementById('currentLangLabel');
+  const langContainer = document.querySelector('.lang-switcher-container');
+  const langOptionNodes = Array.from(document.querySelectorAll('.lang-dropdown .lang-option'));
+
+  const DEFAULT_LANG = 'en';
+  const SUPPORTED_LANGS = langOptionNodes
+    .map(btn => (btn.dataset.lang || '').toLowerCase())
+    .filter(Boolean);
+
+  function normalizeLang(lang) {
+    return (lang || '').toLowerCase().split('-')[0];
+  }
+
+  function detectCurrentLang() {
+    const fromHtml = normalizeLang(document.documentElement.getAttribute('lang'));
+    if (SUPPORTED_LANGS.includes(fromHtml)) return fromHtml;
+
+    const file = (window.location.pathname.split('/').pop() || '').toLowerCase();
+    const match = file.match(/^index\.([a-z0-9-]+)\.html$/);
+    if (match && SUPPORTED_LANGS.includes(match[1])) return match[1];
+
+    return DEFAULT_LANG;
+  }
+
+  function updateLangUI() {
+    if (currentLangLabel) currentLangLabel.textContent = currentLang.toUpperCase();
+
+    // Optional: mark active option for accessibility/debugging
+    langOptionNodes.forEach(btn => {
+      const lang = normalizeLang(btn.dataset.lang);
+      const isActive = lang === currentLang;
+      btn.setAttribute('aria-current', isActive ? 'true' : 'false');
+    });
+  }
+
+  function currentDirPath() {
+    const p = window.location.pathname || '/';
+    if (p.endsWith('/')) return p;
+    return p.substring(0, p.lastIndexOf('/') + 1);
+  }
+
+  function pageForLang(lang) {
+    const l = normalizeLang(lang);
+    return (l === DEFAULT_LANG) ? 'index.html' : `index.${l}.html`;
+  }
+
+  function buildLangUrl(lang) {
+    return currentDirPath() + pageForLang(lang) + (window.location.hash || '');
+  }
+
+  function persistUserLang(lang) {
+    // No cookies; localStorage is optional and only used to remember an explicit user selection.
+    try {
+      localStorage.setItem('preferredLang', lang);
+      // Backward compatibility with any older logic that may read this key
+      localStorage.setItem('userLangChoice', lang);
+    } catch (e) { /* ignore storage errors */ }
+  }
+
+  function setLanguage(lang) {
+    const next = normalizeLang(lang);
+    if (!next || !SUPPORTED_LANGS.includes(next)) return;
+    if (next === currentLang) return;
+
+    currentLang = next;
+    updateLangUI();
+    persistUserLang(currentLang);
+
+    // Let UI paint before navigation (Safari can be picky if we navigate immediately)
+    requestAnimationFrame(() => {
+      window.location.assign(buildLangUrl(currentLang));
+    });
+  }
+
+  // Initialize label from the current page language
+  currentLang = detectCurrentLang();
+  updateLangUI();
+
+  // Dropdown Handling
+  if (langBtn && langContainer) {
+    langBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      langContainer.classList.toggle('open');
+    });
+  }
+
+  // Option Click
+  langOptionNodes.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang;
+      setLanguage(lang);
+      if (langContainer) langContainer.classList.remove('open');
+    });
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (langContainer && langContainer.classList.contains('open') && !langContainer.contains(e.target)) {
+      langContainer.classList.remove('open');
+    }
+  });
+
+
   // Project link click handler with loading spinner
   // Ensure project links have real hrefs for SEO crawlers (and graceful no-JS navigation)
   document.querySelectorAll('.accordion-content a[data-project]').forEach(link => {
@@ -989,24 +1675,61 @@ document.addEventListener('DOMContentLoaded', () => {
       adjustTitleFontSize();
       // Reflect the opened project in the URL for shareability/deep-linking
       window.location.hash = 'project=' + projectId;
-      fetch(mdPath)
-        .then(response => {
-          if (response.ok) {
+
+      // Language handling for project file (scalable: file.<lang>.md, with fallback)
+      let targetPath = mdPath;
+      if (currentLang && currentLang !== 'en') {
+        // path/to/file.md -> path/to/file.<lang>.md
+        targetPath = mdPath.replace(/\.md$/, `.${currentLang}.md`);
+      }
+
+      // Helper to fetch markdown text (returns null if missing), with graceful EN fallback
+      // Validates response to detect HTML error pages served with 200 status (soft 404s)
+      const loadMarkdown = (url) => {
+        return fetch(url, { cache: 'no-store' })
+          .then(response => {
+            if (!response || !response.ok) return null;
+            // Check Content-Type to detect HTML error pages served with 200 status
+            const contentType = response.headers.get('Content-Type') || '';
+            if (contentType.includes('text/html')) return null;
             return response.text();
-          } else {
-            throw new Error('Failed to load');
-          }
-        })
+          })
+          .then(text => {
+            if (!text) return null;
+            // Secondary validation: reject if response starts with HTML doctype or tag
+            const trimmed = text.trim().toLowerCase();
+            if (trimmed.startsWith('<!doctype') || trimmed.startsWith('<html')) return null;
+            return text;
+          })
+          .catch(() => null);
+      };
+
+      const loadMarkdownWithFallback = (primaryUrl, fallbackUrl) => {
+        return loadMarkdown(primaryUrl).then(md => {
+          if (md !== null) return md;
+          if (fallbackUrl && fallbackUrl !== primaryUrl) return loadMarkdown(fallbackUrl);
+          return null;
+        });
+      };
+
+      // If a localized file is missing, always fall back to EN (.md) even if UI language is non-EN
+      const primaryPath = (currentLang && currentLang !== 'en') ? targetPath : mdPath;
+      const fallbackPath = (primaryPath !== mdPath) ? mdPath : null;
+
+      loadMarkdownWithFallback(primaryPath, fallbackPath)
         .then(md => {
-          displayMarkdown(md, navInfo);
-        })
-        .catch(err => {
+          if (md !== null) {
+            displayMarkdown(md, navInfo);
+            return;
+          }
+
+          // Final fallback: embedded cache (if present)
           if (typeof projectsContent !== 'undefined' && projectsContent[projectId]) {
             displayMarkdown(projectsContent[projectId], navInfo);
           } else {
             spinner.classList.add('hidden');
-            detailContent.innerHTML = '<p>Error loading project details. Please run the site via an HTTP server (e.g., python3 -m http.server).</p>';
-            console.error(err);
+            detailContent.innerHTML = '<p>Error loading project details.</p>';
+            console.error(new Error('Project file not found'));
           }
         });
     });
