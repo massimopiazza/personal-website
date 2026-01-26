@@ -93,6 +93,19 @@
 </head>
 
 <body>
+	<!-- SVG Sprite Definitions -->
+	<svg style="display: none;">
+		<symbol id="icon-plus" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" fill="none"
+			stroke-linecap="round" stroke-linejoin="round">
+			<line x1="12" y1="8.5" x2="12" y2="15.5"></line>
+			<line x1="8.5" y1="12" x2="15.5" y2="12"></line>
+		</symbol>
+		<symbol id="icon-close" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none"
+			stroke-linecap="round" stroke-linejoin="round">
+			<line x1="18" y1="6" x2="6" y2="18"></line>
+			<line x1="6" y1="6" x2="18" y2="18"></line>
+		</symbol>
+	</svg>
 	<!-- Navigation -->
 	<nav aria-label="Primary">
 		<a href="#about" class="nav-link active">About</a>
@@ -162,7 +175,9 @@
 						all</button></h2>
 				<div class="accordion">
 					<div class="accordion-item">
-						<div class="accordion-header">Vision-based navigation <span>+</span></div>
+						<div class="accordion-header">Vision-based navigation <span><svg class="icon">
+									<use href="#icon-plus"></use>
+								</svg></span></div>
 						<div class="accordion-content">
 							<ul>
 								<li><a href="projects/vision-based-navigation/cnn-based-spacecraft-pose-estimation.md"
@@ -180,7 +195,9 @@
 						</div>
 					</div>
 					<div class="accordion-item">
-						<div class="accordion-header">Systems engineering <span>+</span></div>
+						<div class="accordion-header">Systems engineering <span><svg class="icon">
+									<use href="#icon-plus"></use>
+								</svg></span></div>
 						<div class="accordion-content">
 							<ul>
 								<li><a href="projects/systems-engineering/satellite-telecommunications.md"
@@ -193,7 +210,9 @@
 						</div>
 					</div>
 					<div class="accordion-item">
-						<div class="accordion-header">Academia <span>+</span></div>
+						<div class="accordion-header">Academia <span><svg class="icon">
+									<use href="#icon-plus"></use>
+								</svg></span></div>
 						<div class="accordion-content">
 							<ul>
 								<!-- [HIDDEN] <li><a href="projects/academia/msc-thesis.md" data-project="projects/academia/msc-thesis.md">MSc thesis [WIP]</a></li> -->
@@ -209,7 +228,9 @@
 						</div>
 					</div>
 					<div class="accordion-item">
-						<div class="accordion-header">Mobile software <span>+</span></div>
+						<div class="accordion-header">Mobile software <span><svg class="icon">
+									<use href="#icon-plus"></use>
+								</svg></span></div>
 						<div class="accordion-content">
 							<ul>
 								<li><a href="projects/mobile-sw/watchapp-inc.md"
@@ -326,7 +347,9 @@
 	<!-- Project Detail View -->
 	<div id="projectDetail" class="detail-view">
 		<div class="detail-header">
-			<button id="closeDetail">X</button>
+			<button id="closeDetail"><svg>
+					<use href="#icon-close"></use>
+				</svg></button>
 			<span id="detailTitle"></span>
 		</div>
 
@@ -337,7 +360,9 @@
 	<!-- Image Viewer Modal -->
 	<div id="imageViewer" class="image-viewer hidden">
 		<div id="viewerCounter" class="viewer-counter"></div>
-		<button id="viewerClose" class="viewer-close">X</button>
+		<button id="viewerClose" class="viewer-close"><svg>
+				<use href="#icon-close"></use>
+			</svg></button>
 		<button id="viewerPrev" class="viewer-nav viewer-prev hidden">
 			<svg viewBox="0 0 24 24" aria-hidden="true">
 				<polyline points="6,10 12,16 18,10" />
