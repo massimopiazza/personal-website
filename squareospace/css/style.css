@@ -1249,7 +1249,7 @@ footer {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
   border: none;
   border-radius: 50%;
   /* Circle shape like show more button effectively */
@@ -1268,8 +1268,16 @@ footer {
   padding: 0.5rem;
 }
 
+@supports ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+  .viewer-nav {
+    background: rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    backdrop-filter: blur(10px) saturate(180%);
+  }
+}
+
 .viewer-nav:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .viewer-prev {
