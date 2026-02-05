@@ -333,12 +333,12 @@
 		<div class="socials">
 			<a href="mailto:info@squareospace.com" data-tooltip="Email" rel="me"><img src="icon/logo/email.svg"
 					alt="Email"></a>
-			<a href="https://www.linkedin.com/in/mpiazza97/" target="_blank" data-tooltip="LinkedIn" rel="me"><img
-					src="icon/logo/linkedin.svg" alt="LinkedIn"></a>
-			<a href="https://x.com/squareospace" target="_blank" data-tooltip="X" rel="me"><img src="icon/logo/x.svg"
-					alt="X"></a>
-			<a href="https://github.com/massimopiazza" target="_blank" data-tooltip="GitHub" rel="me"><img
-					src="icon/logo/github.svg" alt="GitHub"></a>
+			<a href="https://www.linkedin.com/in/mpiazza97/" target="_blank" data-tooltip="LinkedIn"
+				rel="me noopener noreferrer"><img src="icon/logo/linkedin.svg" alt="LinkedIn"></a>
+			<a href="https://x.com/squareospace" target="_blank" data-tooltip="X" rel="me noopener noreferrer"><img
+					src="icon/logo/x.svg" alt="X"></a>
+			<a href="https://github.com/massimopiazza" target="_blank" data-tooltip="GitHub"
+				rel="me noopener noreferrer"><img src="icon/logo/github.svg" alt="GitHub"></a>
 			<a href="files/massimo-piazza.vcf" data-tooltip="Save contact"><img src="icon/action/save-contact.svg"
 					alt="Download VCF contact card"></a>
 		</div>
@@ -347,7 +347,7 @@
 	<!-- Project Detail View -->
 	<div id="projectDetail" class="detail-view">
 		<div class="detail-header">
-			<button id="closeDetail"><svg>
+			<button id="closeDetail" aria-label="Close details view"><svg>
 					<use href="#icon-close"></use>
 				</svg></button>
 			<span id="detailTitle"></span>
@@ -360,10 +360,10 @@
 	<!-- Image Viewer Modal -->
 	<div id="imageViewer" class="image-viewer hidden">
 		<div id="viewerCounter" class="viewer-counter"></div>
-		<button id="viewerClose" class="viewer-close"><svg>
+		<button id="viewerClose" class="viewer-close" aria-label="Close image viewer"><svg>
 				<use href="#icon-close"></use>
 			</svg></button>
-		<button id="viewerPrev" class="viewer-nav viewer-prev hidden">
+		<button id="viewerPrev" class="viewer-nav viewer-prev hidden" aria-label="Previous image">
 			<svg viewBox="0 0 24 24" aria-hidden="true">
 				<polyline points="6,10 12,16 18,10" />
 			</svg>
@@ -372,7 +372,7 @@
 			<div id="viewerTrack" class="viewer-track"></div>
 			<div id="viewerCaption" class="viewer-caption"></div>
 		</div>
-		<button id="viewerNext" class="viewer-nav viewer-next hidden">
+		<button id="viewerNext" class="viewer-nav viewer-next hidden" aria-label="Next image">
 			<svg viewBox="0 0 24 24" aria-hidden="true">
 				<polyline points="6,10 12,16 18,10" />
 			</svg>
@@ -380,7 +380,7 @@
 	</div>
 
 	<!-- Load marked library for markdown parsing -->
-	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
 
 
 	<!-- Cache loader for static website export: UNCOMMENT from static exports -->
@@ -389,9 +389,14 @@
 	-->
 
 	<!-- Load Custom Components -->
-	<script src="js/components.js"></script>
+	<!-- Load Custom Components -->
+	<!-- <script src="js/components.js"></script> -->
 
 	<!-- Load external JavaScript -->
+	<script src="js/image-viewer.js"></script>
+	<script src="js/nav.js"></script>
+	<script src="js/project-detail.js"></script>
+	<script src="js/dock.js"></script>
 	<script src="js/main.js"></script>
 </body>
 
