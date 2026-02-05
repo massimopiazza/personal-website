@@ -15,6 +15,7 @@ At [Infinite Orbits](https://www.infiniteorbits.io), I later went on to tackle a
   <figcaption>
     <div style="width:85%">
       Demo of CNN-based pose estimation + Unscented Kalman Filtering pipeline, running on Blender-generated imagery
+      <citation-link n="1" href="https://iac2022-iaf.ipostersessions.com/default.aspx?s=06-8E-09-44-37-08-A5-FE-86-E3-7D-83-D5-B0-54-D9"></citation-link>
     </div>
   </figcaption>
 </figure>

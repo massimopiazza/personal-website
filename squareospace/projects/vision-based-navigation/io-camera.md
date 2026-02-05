@@ -14,6 +14,7 @@ The camera can operate as:
   <figcaption>
     <div style="width:85%">
       Proximity navigation camera / star tracker (right) and laser range finder (left)
+      <citation-link n="1" href="https://www.startuppirate.com/p/the-2023-startup-pirate-year-in-review"></citation-link>
     </div>
   </figcaption>
 </figure>
@@ -33,11 +34,15 @@ My cross-functional role led me to work across **hardware**, **software**, **sim
 <div style="display: flex; justify-content: space-between; align-items: center; gap: 5px; flex-wrap: wrap;">
   <figure style="width: 56%; margin: 0; display: flex; flex-direction: column; align-items: center;">
     <img src="img/camera_calibration_testbed.jpg" alt="camera and optical testbed" style="width: 100%; height: auto;" width="1200" height="752">
-    <figcaption style="text-align: center;">Engineering model of the camera on optical testbed</figcaption>
+    <figcaption style="text-align: center;">Engineering model of the camera on optical testbed
+          <citation-link n="2" href="https://web.archive.org/web/20260205122457/https%3A%2F%2Fwww.linkedin.com%2Fposts%2Finfinite-orbits_ssa-infiniteorbits-rendezvous-activity-7158769668009201666-d0ha"></citation-link>
+    </figcaption>
   </figure>
 
   <figure style="width: 42%; margin: 0; display: flex; flex-direction: column; align-items: center;">
     <img src="img/ST_night_sky_testing.jpg" alt="night sky testing" style="width: 100%; height: auto;" width="1280" height="1464">
-    <figcaption style="text-align: center;">Tripod-mounted camera during night sky testing campaign</figcaption>
+    <figcaption style="text-align: center;">Tripod-mounted camera during night sky testing campaign
+      <citation-link n="3" href="https://web.archive.org/web/20260205123524/https%3A%2F%2Fwww.linkedin.com%2Fposts%2Finfinite-orbits_infiniteorbits-spacerendezvous-inorbitservicing-activity-7142909425094205441-gFeL"></citation-link>  
+    </figcaption>
   </figure>
 </div>
