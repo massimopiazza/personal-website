@@ -462,6 +462,17 @@ button {
   filter: invert(25%);
 }
 
+.copyright {
+  margin-top: 1.5rem;
+  margin-bottom: -1.0rem;
+  text-align: left;
+  font-size: 0.65rem;
+  color: #999;
+  font-family: 'BodyDefense', sans-serif;
+  letter-spacing: 0.05rem;
+  white-space: nowrap;
+}
+
 /* Footer and social icons */
 footer {
   position: fixed;

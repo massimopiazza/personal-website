@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Notice | Massimo Piazza</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <svg style="display: none;">
+    <symbol id="icon-close" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </symbol>
+  </svg>
+
+  <button id="closeDetail" aria-label="Close privacy page">
+    <svg>
+      <use href="#icon-close"></use>
+    </svg>
+  </button>
+
+  <main>
+    <section>
+      <h1>Privacy Notice</h1>
+      <p>Site owner (controller): Massimo Piazza</p>
+      <p>Contact: <a href="mailto:info@squareospace.com">info@squareospace.com</a></p>
+
+      <br>
+      <h3>What data is processed</h3>
+      <p>When you visit this site, technical request data may be processed, including IP address, timestamp, requested URL, user-agent, referrer, and related security signals.</p>
+      <p>This site is delivered and protected through Cloudflare, which processes this data as a processor to provide CDN and security services.</p>
+
+      <br>
+      <h3>Purpose and legal basis</h3>
+      <p>Data is processed to deliver the website, maintain performance, and prevent abuse or malicious traffic.</p>
+      <p>Legal basis: legitimate interests under Article 6(1)(f) GDPR (operating and securing the website).</p>
+
+      <br>
+      <h3>Recipients / processors</h3>
+      <p>Cloudflare, Inc. (CDN and security provider).</p>
+
+      <br>
+      <h3>Retention</h3>
+      <p>Data is retained for as long as needed for security and operational purposes, as configured in Cloudflare.</p>
+
+      <br>
+      <h3>Cookies and storage</h3>
+      <p>We do not use analytics or advertising cookies, marketing pixels, or cross-site tracking.</p>
+      <p>Cloudflare may set strictly necessary security cookies (for example, <code>cf_clearance</code>) when security challenges are triggered.</p>
+
+      <br>
+      <h3>Your rights</h3>
+      <p>You may request access, erasure, or object to processing where applicable. To exercise your rights, contact <a href="mailto:info@squareospace.com">info@squareospace.com</a>. You may also lodge a complaint with your local supervisory authority.</p>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const closeButton = document.getElementById('closeDetail');
+
+      function hasSameOriginReferrer() {
+        if (!document.referrer) {
+          return false;
+        }
+
+        try {
+          return new URL(document.referrer).origin === window.location.origin;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      closeButton.addEventListener('click', function () {
+        if (window.history.length > 1 && hasSameOriginReferrer()) {
+          window.history.back();
+          return;
+        }
+
+        window.location.href = './index.html';
+      });
+    })();
+  </script>
+</body>
+</html>
