@@ -120,7 +120,7 @@ nav .nav-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 4rem;
   width: max-content;
   max-width: 100%;
   height: 100%;
@@ -655,7 +655,7 @@ footer {
 
   nav .nav-content {
     width: 100%;
-    gap: clamp(0.5rem, 3vw, 1.25rem);
+    gap: clamp(1rem, 6vw, 2.5rem);
   }
 
   nav a {
@@ -663,7 +663,7 @@ footer {
   }
 
   nav a[href="#projects"] {
-    white-space: normal;
+    white-space: pre-line;
     text-wrap: balance;
   }
 
