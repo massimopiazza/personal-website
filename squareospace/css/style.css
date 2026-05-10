@@ -119,6 +119,10 @@ nav .nav-content {
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  width: max-content;
+  max-width: 100%;
   height: 100%;
   transform: translateX(var(--bar-content-shift));
   transition: transform 0.3s ease;
@@ -128,17 +132,29 @@ nav a {
   font-family: 'TitleDefense', sans-serif;
   color: #fff;
   text-decoration: none;
-  margin-right: 2rem;
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   padding: 0.5rem 0;
-}
-
-nav a:last-child {
-  margin-right: 0;
+  text-align: center;
+  line-height: 1.15;
+  white-space: nowrap;
 }
 
 nav a:hover {
   opacity: 0.8;
+}
+
+nav a:focus:not(:focus-visible) {
+  outline: none;
+}
+
+nav a:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 nav .indicator {
@@ -633,8 +649,32 @@ footer {
 }
 
 @media (max-width: 767px) {
+  nav {
+    padding-inline: clamp(0.5rem, 3vw, 1rem);
+  }
+
+  nav .nav-content {
+    width: 100%;
+    gap: clamp(0.5rem, 3vw, 1.25rem);
+  }
+
+  nav a {
+    flex: 0 0 auto;
+  }
+
+  nav a[href="#projects"] {
+    white-space: normal;
+    text-wrap: balance;
+  }
+
   #pageContent.slide {
     transform: translateX(-100%);
+  }
+}
+
+@media (max-width: 370px) {
+  nav a[href="#projects"] {
+    max-width: 5.25rem;
   }
 }
 
