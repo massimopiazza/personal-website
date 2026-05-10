@@ -5,16 +5,18 @@
 (() => {
   function initNav({ navHeight, extraOffset, expandAllBtn }) {
     // Navigation indicator setup
+    const navContent = document.getElementById('navContent');
     const indicator = document.getElementById('indicator');
-    const links = document.querySelectorAll('nav .nav-link');
+    const links = navContent ? navContent.querySelectorAll('.nav-link') : [];
     const sections = Array.from(links).map(link => ({
       id: link.getAttribute('href').substring(1),
       link
     }));
 
     function updateIndicator(elem) {
+      if (!elem || !indicator || !navContent) return;
       const rect = elem.getBoundingClientRect();
-      const navRect = document.querySelector('nav').getBoundingClientRect();
+      const navRect = navContent.getBoundingClientRect();
       indicator.style.left = (rect.left - navRect.left) + 'px';
       indicator.style.width = rect.width + 'px';
     }
@@ -112,25 +114,32 @@
       });
     });
 
-    let scrollTimeout;
-    window.addEventListener('scroll', () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        const viewportCenter = window.innerHeight / 2;
-        let current = sections[0];
-        sections.forEach(sec => {
-          if (document.getElementById(sec.id).getBoundingClientRect().top <= viewportCenter) {
-            current = sec;
-          }
-        });
-        links.forEach(l => l.classList.remove('active'));
-        current.link.classList.add('active');
-        updateIndicator(current.link);
-      }, 50);
-    });
+    if (sections.length) {
+      let scrollTimeout;
+      window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          const viewportCenter = window.innerHeight / 2;
+          let current = sections[0];
+          sections.forEach(sec => {
+            if (document.getElementById(sec.id).getBoundingClientRect().top <= viewportCenter) {
+              current = sec;
+            }
+          });
+          links.forEach(l => l.classList.remove('active'));
+          current.link.classList.add('active');
+          updateIndicator(current.link);
+        }, 50);
+      });
+    }
 
-    const initial = document.querySelector('nav .nav-link.active');
+    const initial = navContent ? navContent.querySelector('.nav-link.active') : null;
     if (initial) updateIndicator(initial);
+
+    window.addEventListener('resize', () => {
+      const active = navContent ? navContent.querySelector('.nav-link.active') : null;
+      if (active) updateIndicator(active);
+    });
 
     // Accordion animation
     document.querySelectorAll('.accordion-header').forEach(header => {
@@ -157,4 +166,3 @@
   window.squareospace = window.squareospace || {};
   window.squareospace.initNav = initNav;
 })();
-

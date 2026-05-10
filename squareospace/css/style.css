@@ -46,6 +46,7 @@
   /* Top bar and Footer background */
   --bar-bg: rgb(21, 0, 0);
   --bar-glass-bg: rgba(11, 0, 0, 0.825);
+  --bar-content-shift: 0px;
   /* voluntarily dimmer red on glass bg to compensate for transparency over white  */
   /* Table styling */
   --table-border: 1px solid #000;
@@ -108,9 +109,19 @@ nav {
   height: var(--nav-height);
   background: var(--bar-bg);
   display: flex;
+  justify-content: center;
   align-items: center;
   padding: 0 2rem;
   z-index: 100;
+}
+
+nav .nav-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  transform: translateX(var(--bar-content-shift));
+  transition: transform 0.3s ease;
 }
 
 nav a {
@@ -488,6 +499,7 @@ footer {
 
 .socials {
   display: flex;
+  transform: translateX(var(--bar-content-shift));
   transition: transform 0.3s ease;
 }
 

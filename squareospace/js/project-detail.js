@@ -147,9 +147,9 @@
     const detailView = document.getElementById('projectDetail');
     const detailContent = document.getElementById('detailContent');
     const closeBtn = document.getElementById('closeDetail');
-    const footerSocials = document.querySelector('footer .socials');
     const detailHeader = document.querySelector('.detail-header');
     const spinner = document.getElementById('loadingSpinner');
+    const rootStyle = document.documentElement.style;
 
     // Expand All button handler
     if (expandAllBtn) {
@@ -193,20 +193,16 @@
     function openDetail() {
       pageContent.classList.add('slide');
       detailView.classList.add('open');
-      shiftFooter();
+      updateBarCentering();
     }
 
-    function shiftFooter() {
-      // Only on desktop viewports
-      if (window.innerWidth >= 768) {
+    function updateBarCentering() {
+      if (window.innerWidth >= 768 && detailView.classList.contains('open')) {
         const detailWidth = detailView.getBoundingClientRect().width;
-        const shift = detailWidth / 2;
-        footerSocials.style.transform = `translateX(-${shift}px)`;
+        rootStyle.setProperty('--bar-content-shift', `-${detailWidth / 2}px`);
+        return;
       }
-    }
-
-    function resetFooter() {
-      footerSocials.style.transform = '';
+      rootStyle.setProperty('--bar-content-shift', '0px');
     }
 
     function closeDetail() {
@@ -214,7 +210,7 @@
       pageContent.classList.remove('slide');
       detailView.classList.remove('open');
       detailContent.innerHTML = '';
-      resetFooter();
+      updateBarCentering();
       detailHeader.classList.remove('scrolled');
       // clear any inline drag transforms and transitions
       detailView.style.transform = '';
@@ -400,7 +396,7 @@
     window.addEventListener('resize', () => {
       if (detailView.classList.contains('open')) {
         adjustTitleFontSize();
-        shiftFooter();
+        updateBarCentering();
         // Workaround: trigger click on current Everboard icon to reset carousel on resize
         const carousel = detailContent.querySelector('.header_carrousel');
         if (carousel) {
@@ -419,6 +415,8 @@
         }
       }
     });
+
+    updateBarCentering();
 
     // Project link click handler with loading spinner
     // Ensure project links have real hrefs for SEO crawlers (and graceful no-JS navigation)
@@ -581,4 +579,3 @@
   window.squareospace = window.squareospace || {};
   window.squareospace.initProjectDetail = initProjectDetail;
 })();
-
