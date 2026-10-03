@@ -1,15 +1,15 @@
 /* Main stylesheet for Massimo Piazza personal site */
 
-/* Import custom fonts for the website */
+/* Self-hosted fonts; copyright notices and licences are in ../fonts/. */
 @font-face {
   font-family: 'TitleDefense';
-  src: url('https://fonts.gstatic.com/s/spacegrotesk/v21/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj7oUXskPMZBSSJLm2E.woff') format('woff');
+  src: url('../fonts/space-grotesk-v21.woff') format('woff');
   font-display: swap;
 }
 
 @font-face {
   font-family: 'BodyDefense';
-  src: url('https://fonts.gstatic.com/s/inter/v18/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2') format('woff2');
+  src: url('../fonts/inter-v18.woff2') format('woff2');
   font-display: swap;
 }
 
