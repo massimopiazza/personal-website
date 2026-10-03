@@ -500,6 +500,19 @@ button {
   white-space: nowrap;
 }
 
+.copyright .privacy-link {
+  display: inline-block;
+  padding: 5px 0;
+  font-size: 0.75rem;
+  line-height: 0.875rem;
+  color: #666;
+}
+
+.copyright .privacy-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 /* Footer and social icons */
 footer {
   position: fixed;
