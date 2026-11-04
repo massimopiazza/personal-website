@@ -610,10 +610,20 @@ footer {
   height: var(--nav-height);
   padding: 0 var(--side-margin);
   background: #fff;
-  position: sticky;
+  position: absolute;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 210;
   transition: box-shadow 0.3s ease;
+}
+
+@supports ((-webkit-backdrop-filter: blur(16px)) or (backdrop-filter: blur(16px))) {
+  .detail-header {
+    background: rgba(255, 255, 255, 0.75);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+  }
 }
 
 .detail-header::after {
@@ -646,7 +656,9 @@ footer {
 }
 
 .detail-body {
-  padding: var(--extra-offset) var(--side-margin) var(--side-margin) var(--side-margin);
+  /* Keep the first paragraph below the bar while allowing scrolling beneath it. */
+  padding: calc(var(--nav-height) + var(--extra-offset)) var(--side-margin) var(--side-margin) var(--side-margin);
+  scroll-padding-top: calc(var(--nav-height) + var(--extra-offset));
   overflow-y: auto;
   overscroll-behavior: contain;
   flex: 1;
@@ -801,7 +813,7 @@ footer {
 
 @media (max-width: 767px) {
   .detail-body {
-    padding: var(--extra-offset) var(--side-margin-mobile) var(--side-margin) var(--side-margin-mobile);
+    padding-inline: var(--side-margin-mobile);
   }
 }
 
