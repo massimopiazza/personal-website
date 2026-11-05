@@ -30,6 +30,7 @@
 	<meta name="twitter:image" content="https://squareospace.com/img/massimo_piazza_profile_pic.webp">
 	<!-- Styles -->
 	<link rel="stylesheet" href="css/style.css">
+	<script src="js/reveal.js" defer></script>
 	<!-- Structured Data: Person with Service catalog -->
 	<script type="application/ld+json">
 	{
@@ -122,16 +123,16 @@
 		<main>
 			<!-- About Section -->
 			<section id="about">
-				<h1>Massimo Piazza</h1>
-				<h3>
+				<h1 data-reveal>Massimo Piazza</h1>
+				<h3 data-reveal data-reveal-delay="80">
 					space systems <span class="accent" aria-hidden="true">•</span>
 					computer vision <span class="accent" aria-hidden="true">•</span>
 					telecommunications <span class="accent" aria-hidden="true">•</span>
 					autonomy
 					<br> deeptech startup advisor
 				</h3>
-				<img src="img/massimo_piazza_profile_pic.webp" alt="profile-pic" width="150" height="150">
-				<p class="bio-para">I am an engineer with 6 years of working experience in the aerospace industry and a
+				<img src="img/massimo_piazza_profile_pic.webp" alt="profile-pic" width="150" height="150" data-reveal="fade" data-reveal-delay="160" fetchpriority="high" decoding="async">
+				<p class="bio-para" data-reveal data-reveal-delay="240">I am an engineer with 6 years of working experience in the aerospace industry and a
 					MSc in Space Engineering from Politecnico di Milano.
 					<br>Over my career, I've led the development of vision-based navigation technologies for autonomous
 					spacecraft, coordinated cross-functional teams of a complex SatCom constellation program, developed
@@ -178,9 +179,9 @@
 
 			<!-- Work & Projects Section -->
 			<section id="projects">
-				<h2>Work & Projects <button id="expandAll" class="expand-all-btn hover-accent-overlay">expand
+				<h2 data-reveal>Work & Projects <button id="expandAll" class="expand-all-btn hover-accent-overlay">expand
 						all</button></h2>
-				<div class="accordion">
+				<div class="accordion" data-reveal>
 					<div class="accordion-item">
 						<div class="accordion-header">Vision-based navigation <span><svg class="icon">
 									<use href="#icon-plus"></use>
@@ -253,7 +254,7 @@
 					</div>
 				</div>
 
-				<div class="download-resume-wrapper">
+				<div class="download-resume-wrapper" data-reveal="fade">
 					<a href="files/resume_massimo-piazza.pdf" download class="download-resume">
 						<img src="icon/action/download.svg" alt="Download resume"
 							style="width:1.5rem; height:1.5rem; margin-right:0.5rem;">
@@ -264,12 +265,12 @@
 
 			<!-- Consulting Section -->
 			<section id="consulting">
-				<h2>Consulting for DeepTech</h2>
-				<p>Advisory and hands-on support for DeepTech startups and investors, with a focus on aerospace &
+				<h2 data-reveal>Consulting for DeepTech</h2>
+				<p data-reveal>Advisory and hands-on support for DeepTech startups and investors, with a focus on aerospace &
 					defense.</p>
 				<br>
 
-				<h3 id="consultingSummaryHeading">
+				<h3 id="consultingSummaryHeading" data-reveal>
 					aerospace & defense system architect <span class="accent" aria-hidden="true">•</span>
 					agile systems engineering <span class="accent" aria-hidden="true">•</span>
 					vision-based perception & autonomy <span class="accent" aria-hidden="true">•</span>
@@ -316,7 +317,7 @@
 
 			<!-- Contact Section -->
 			<section id="contact">
-				<h2>Contact Me</h2>
+				<h2 data-reveal>Contact Me</h2>
 				<form id="contact-form" action="https://formspree.io/f/mkgrjbok" method="POST">
 					<label for="name">Name</label>
 					<input type="text" id="name" name="name" required>
@@ -399,7 +400,7 @@
 	</div>
 
 	<!-- Load marked library for markdown parsing -->
-	<script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js" defer></script>
 
 
 	<!-- Cache loader for static website export: UNCOMMENT from static exports -->
@@ -412,11 +413,11 @@
 	<!-- <script src="js/components.js"></script> -->
 
 	<!-- Load external JavaScript -->
-	<script src="js/image-viewer.js"></script>
-	<script src="js/nav.js"></script>
-	<script src="js/project-detail.js"></script>
-	<script src="js/dock.js"></script>
-	<script src="js/main.js"></script>
+	<script src="js/image-viewer.js" defer></script>
+	<script src="js/nav.js" defer></script>
+	<script src="js/project-detail.js" defer></script>
+	<script src="js/dock.js" defer></script>
+	<script src="js/main.js" defer></script>
 </body>
 
 </html>

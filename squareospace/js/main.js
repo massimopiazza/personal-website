@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
       navHeight,
       extraOffset,
       expandAllBtn,
+      reveals: api.pageReveals,
     });
   }
 

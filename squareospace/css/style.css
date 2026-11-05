@@ -667,9 +667,9 @@ footer {
 /* Slide pageContent when detail open */
 @media (min-width: 768px) {
 
-  /* shift content so that your centered layout's left edge sits at the side margin */
+  /* Shift wide layouts left; narrower tablets must never be pushed beyond the viewport. */
   #pageContent.slide {
-    transform: translateX(calc(var(--side-margin) - ((100vw - var(--content-max-width)) / 2)));
+    transform: translateX(min(0px, calc(var(--side-margin) - ((100vw - var(--content-max-width)) / 2))));
   }
 }
 
@@ -1684,4 +1684,34 @@ footer {
 
 .nav-icon.right {
   transform: rotate(-90deg);
+}
+
+/* Content entrances use the Web Animations API and leave no hidden CSS state. */
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    scroll-behavior: auto;
+  }
+
+  #pageContent,
+  nav .nav-content,
+  nav .indicator,
+  .detail-view,
+  .bio-extra,
+  .accordion-header,
+  .accordion-header::after,
+  .accordion-header span,
+  .accordion-content,
+  #consultingSummaryHeading,
+  #consultingSummaryHeading.consulting-fast-fade,
+  .image-loader-wrapper img,
+  .image-loader-wrapper.loaded .loader-overlay {
+    transition: none;
+  }
+
+  .loader-overlay {
+    animation: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 }

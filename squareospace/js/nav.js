@@ -3,7 +3,9 @@
  */
 
 (() => {
-  function initNav({ navHeight, extraOffset, expandAllBtn }) {
+  function initNav({ navHeight, extraOffset, expandAllBtn, reveals }) {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const scrollBehavior = () => reduced.matches ? 'instant' : 'smooth';
     // Navigation indicator setup
     const navContent = document.getElementById('navContent');
     const indicator = document.getElementById('indicator');
@@ -12,6 +14,11 @@
       id: link.getAttribute('href').substring(1),
       link
     }));
+
+    function setExpanded(element, expanded) {
+      element.classList.toggle('open', expanded);
+      element.style.maxHeight = expanded ? `${element.scrollHeight}px` : '';
+    }
 
     function updateIndicator(elem) {
       if (!elem || !indicator || !navContent) return;
@@ -23,8 +30,10 @@
 
     // Bio toggle
     document.getElementById('toggleBio').addEventListener('click', () => {
+      reveals?.finishWithin(document.getElementById('about'));
       const bio = document.getElementById('bioExtra');
-      const isOpen = bio.classList.toggle('open');
+      const isOpen = !bio.classList.contains('open');
+      setExpanded(bio, isOpen);
       document.getElementById('toggleBio').classList.toggle('open', isOpen);
     });
 
@@ -36,6 +45,7 @@
       const EXPAND_FADE_DURATION = 200; // ms, keep in sync with CSS .consulting-fast-fade
 
       consultingToggle.addEventListener('click', () => {
+        reveals?.finishWithin(document.getElementById('consulting'));
         const isOpen = consultingExtra.classList.contains('open');
 
         if (!isOpen) {
@@ -52,32 +62,32 @@
                 consultingSummary.style.display = 'none';
                 consultingSummary.classList.remove('consulting-fast-fade');
                 // now expand the details
-                consultingExtra.classList.add('open');
+                setExpanded(consultingExtra, true);
                 consultingToggle.classList.add('open');
                 setTimeout(() => {
                   const consultingSection = document.getElementById('consulting');
                   window.scrollTo({
                     top: consultingSection.offsetTop - navHeight - extraOffset,
-                    behavior: 'smooth'
+                    behavior: scrollBehavior()
                   });
                 }, 200);
               }
             }, EXPAND_FADE_DURATION);
           } else {
             // Fallback: no summary, just open details
-            consultingExtra.classList.add('open');
+            setExpanded(consultingExtra, true);
             consultingToggle.classList.add('open');
             setTimeout(() => {
               const consultingSection = document.getElementById('consulting');
               window.scrollTo({
                 top: consultingSection.offsetTop - navHeight - extraOffset,
-                behavior: 'smooth'
+                behavior: scrollBehavior()
               });
             }, 200);
           }
         } else {
           // COLLAPSE: collapse details and fade summary back in in parallel
-          consultingExtra.classList.remove('open');
+          setExpanded(consultingExtra, false);
           consultingToggle.classList.remove('open');
 
           if (consultingSummary) {
@@ -101,9 +111,10 @@
         link.addEventListener('click', e => {
           e.preventDefault();
           const target = document.getElementById(href.substring(1));
+          reveals?.finishWithin(target);
           window.scrollTo({
             top: target.offsetTop - navHeight - extraOffset,
-            behavior: 'smooth'
+            behavior: scrollBehavior()
           });
         });
       }
@@ -139,6 +150,7 @@
     window.addEventListener('resize', () => {
       const active = navContent ? navContent.querySelector('.nav-link.active') : null;
       if (active) updateIndicator(active);
+      document.querySelectorAll('.bio-extra.open').forEach(element => setExpanded(element, true));
     });
 
     // Accordion animation

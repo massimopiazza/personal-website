@@ -150,6 +150,13 @@
     const detailHeader = document.querySelector('.detail-header');
     const spinner = document.getElementById('loadingSpinner');
     const rootStyle = document.documentElement.style;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const detailReveals = window.squareospace.createReveals?.({
+      root: detailContent,
+      rootMargin: `-${navHeight + extraOffset}px 0px -10% 0px`,
+    });
+    let activeRequest = null;
+    let activeProjectId = null;
 
     // Expand All button handler
     if (expandAllBtn) {
@@ -171,7 +178,7 @@
           const projectsSection = document.getElementById('projects');
           window.scrollTo({
             top: projectsSection.offsetTop - navHeight - extraOffset,
-            behavior: 'smooth'
+            behavior: reduced.matches ? 'instant' : 'smooth'
           });
         }, 200);
       });
@@ -206,6 +213,10 @@
     }
 
     function closeDetail() {
+      activeRequest?.abort();
+      activeRequest = null;
+      activeProjectId = null;
+      detailReveals?.reset();
       stopEverboardCarousel(detailContent);
       pageContent.classList.remove('slide');
       detailView.classList.remove('open');
@@ -233,7 +244,19 @@
 
     function displayMarkdown(md, navInfo = null) {
       spinner.classList.add('hidden');
-      detailContent.innerHTML = marked.parse(md);
+      detailReveals?.reset();
+      // Set loading hints before insertion so offscreen project images can defer their requests.
+      const template = document.createElement('template');
+      template.innerHTML = marked.parse(md);
+      template.content.querySelectorAll('img').forEach(img => {
+        if (!img.closest('.header_carrousel') && !img.hasAttribute('loading')) img.loading = 'lazy';
+        img.decoding = 'async';
+      });
+      template.content.querySelectorAll('video:not([preload])').forEach(video => {
+        video.preload = 'metadata';
+      });
+      detailContent.replaceChildren(template.content);
+      detailContent.scrollTop = 0;
       initEverboardCarousel(detailContent);
       // Ensure links open in new tab
       ensureNewTabLinks(detailContent);
@@ -287,16 +310,16 @@
         wrapper.appendChild(loader);
         wrapper.classList.add('loading');
 
-        img.onload = () => {
+        const finishLoading = () => {
           wrapper.classList.remove('loading');
           wrapper.classList.add('loaded');
           setTimeout(() => { if (loader.parentNode) loader.remove(); }, 600);
         };
+        img.addEventListener('load', finishLoading, { once: true });
+        img.addEventListener('error', finishLoading, { once: true });
 
         // Safety check in case it loaded while executing
-        if (img.complete && img.naturalHeight !== 0) {
-          img.onload();
-        }
+        if (img.complete) finishLoading();
       });
 
       // Setup Image Viewer
@@ -390,6 +413,13 @@
 
         detailContent.appendChild(navContainer);
       }
+
+      const blocks = Array.from(detailContent.children).filter(element =>
+        !element.matches('style, script, .detail-nav-buttons'));
+      blocks.forEach(element => {
+        if (element.matches('figure') || element.querySelector('img, video')) element.dataset.reveal = 'fade';
+      });
+      detailReveals?.observe(blocks);
     }
 
     // Adjust font size and re-center footer icons on detail view resize
@@ -434,6 +464,12 @@
         detailTitle.textContent = title;
         const mdPath = link.getAttribute('data-project');
         const projectId = mdPath.split('/').pop().replace('.md', '');
+        // The URL update also fires hashchange; it must not fetch and animate the same panel twice.
+        if (activeProjectId === projectId && detailView.classList.contains('open')) return;
+        activeRequest?.abort();
+        const request = new AbortController();
+        activeRequest = request;
+        activeProjectId = projectId;
 
         // Determine navigation context (Previous/Next in same accordion section)
         let navInfo = { prev: null, next: null };
@@ -468,13 +504,14 @@
 
         // Clear old content and show spinner
         stopEverboardCarousel(detailContent);
+        detailReveals?.reset();
         detailContent.innerHTML = '';
         spinner.classList.remove('hidden');
         openDetail();
         adjustTitleFontSize();
         // Reflect the opened project in the URL for shareability/deep-linking
         window.location.hash = 'project=' + projectId;
-        fetch(mdPath)
+        fetch(mdPath, { signal: request.signal })
           .then(response => {
             if (response.ok) {
               return response.text();
@@ -483,9 +520,11 @@
             }
           })
           .then(md => {
+            if (request !== activeRequest) return;
             displayMarkdown(md, navInfo);
           })
           .catch(err => {
+            if (request !== activeRequest || request.signal.aborted) return;
             if (typeof projectsContent !== 'undefined' && projectsContent[projectId]) {
               displayMarkdown(projectsContent[projectId], navInfo);
             } else {
